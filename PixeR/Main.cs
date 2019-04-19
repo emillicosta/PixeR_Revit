@@ -78,8 +78,8 @@ namespace PixeR
                     allMaterial.Add(GetMaterialFace(f, doc));
                 }
 
-                LightType ligths = GetLightData(doc);
-                TaskDialog.Show("p",ligths.ColorFilter.Red.ToString());
+                List<LightType> lights = GetLightsData(doc);
+                TaskDialog.Show("Qtd de luzes", lights.Count.ToString());
 
                 //exibir a malha e o material da malha todos
 
@@ -131,6 +131,8 @@ namespace PixeR
                 return Result.Failed;
             }
         }
+
+        //Fim Main
 
         private void AddView3D(UIApplication uiapp, Document doc, Double altura)
         {
@@ -246,8 +248,7 @@ namespace PixeR
             //TaskDialog.Show("Revit", faces.Size.ToString());
             return faces;
         }
-
-
+        
         private List<Material> GetMaterialFace(List<Face> faces, Document doc)
         {
             List<Material> materiais = new List<Material>();
@@ -321,17 +322,18 @@ namespace PixeR
             //TaskDialog.Show("Revit", message.ToString());
         }
 
-        public LightType GetLightData(Document document)
+        public List<LightType> GetLightsData(Document document)
         {
+            List<LightType> lightTypes = new List<LightType>();
             // This code demonstrates how to get light information from project and family document
-            LightType lightData = null;
+            
             if (document.IsFamilyDocument)
             {
                 // In family document, get LightType via LightFamily.GetLightType(int) method. 
                 LightFamily lightFamily = LightFamily.GetLightFamily(document);
                 for (int index = 0; index < lightFamily.GetNumberOfLightTypes(); index++)
                 {
-                    lightData = lightFamily.GetLightType(index);
+                    lightTypes.Add(lightFamily.GetLightType(index));
                 }
             }
             else
@@ -340,23 +342,16 @@ namespace PixeR
                 // In order to get the light information, please get a light fixture instance first
                 FilteredElementCollector collector = new FilteredElementCollector(document);
                 collector.OfClass(typeof(FamilyInstance)).OfCategory(BuiltInCategory.OST_LightingFixtures);
-                FamilyInstance lightFixture = collector.Cast<FamilyInstance>().First<FamilyInstance>();
-                if (lightFixture == null)    // check null reference
-                    return null;
 
-                // Get the LightType for given light fixture
-                lightData = LightType.GetLightTypeFromInstance(document, lightFixture.Id);
+                IEnumerable<FamilyInstance> familyInstances = collector.Cast<FamilyInstance>();
+
+                foreach (FamilyInstance lightFixture in familyInstances)
+                {
+                    lightTypes.Add(LightType.GetLightTypeFromInstance(document, lightFixture.Id));
+                }
             }
 
-            // Get the light data via LightType
-            Color filterColor = lightData.ColorFilter;  // get the ColorFilter property
-            LossFactor lossFactor = lightData.GetLossFactor();  // get the loss factor
-            if (lossFactor is AdvancedLossFactor)
-            {
-                AdvancedLossFactor advancedFactor = lossFactor as AdvancedLossFactor;
-                double luminaireValue = advancedFactor.LuminaireDirtDepreciation;
-            }
-            return lightData;
+            return lightTypes;
         }
 
 
