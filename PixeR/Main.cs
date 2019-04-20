@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Reflection;
 using System.Linq;
+using System.Collections.Generic;
+using System.Text;
+using System.Windows.Media.Imaging;
+
 using Autodesk.Revit.UI;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.Attributes;
-using System.Windows.Media.Imaging;
 using Autodesk.Revit.UI.Selection;
-using System.Collections.Generic;
-using System.Text;
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB.Visual;
 using Autodesk.Revit.DB.Lighting;
@@ -79,14 +80,14 @@ namespace PixeR
                 }
 
                 List<LightType> lights = GetLightsData(doc);
-                TaskDialog.Show("Qtd de luzes", lights.Count.ToString());
+
 
                 //exibir a malha e o material da malha todos
 
-                String mensagem = "";
 
                 if (allMaterial.Count == elem.Count)
                 {
+                    String mensagem = "";
                     for (int i = 0; i < 0; i++)
                     {
                         mensagem += elem[i].Name + " \n";
@@ -105,25 +106,25 @@ namespace PixeR
                                 mensagem += (j+1).ToString() + "- " + vertex1.ToString() + vertex2.ToString() + vertex3.ToString() + " " + allMaterial[i][j].Name + "\n";
                             }
                         }
-                        TaskDialog.Show("Elementos", mensagem);
+                        //TaskDialog.Show("Elementos", mensagem);
                         mensagem = "";
                     }
                     
                 }
-                else
-                {
-                    TaskDialog.Show("o", "a qtd de material não é igual a quantidade de elementos");
-                }
 
-                //Form1.WinForm wf = new Form1.WinForm(commandData);
-                //wf.ShowDialog();
-                ///Double altura = wf.getZ() / 30;//nº 30 foi tentativa e erro
-                //View view = doc.ActiveView;
-                //altura += view.GenLevel.Elevation;
+                Form1.WinForm wf = new Form1.WinForm(commandData);
+                wf.ShowDialog();
+                Double altura = wf.getZ() / 30;//nº 30 foi tentativa e erro
+                View view = doc.ActiveView;
+                altura += view.GenLevel.Elevation;
 
-                //AddView3D(uiapp, doc, altura);
+                AddView3D(uiapp, doc, altura);
+
+                Form2.FormRender fr = new Form2.FormRender(commandData);
+                fr.ShowDialog();
 
                 return Result.Succeeded;
+                
             }
             catch (Exception e)
             {
