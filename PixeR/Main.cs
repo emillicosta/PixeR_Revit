@@ -115,12 +115,11 @@ namespace PixeR
                 Form1.WinForm wf = new Form1.WinForm(commandData);
                 wf.ShowDialog();
                 Double altura = wf.getZ() / 30;//nº 30 foi tentativa e erro
-                View view = doc.ActiveView;
-                altura += view.GenLevel.Elevation;
 
                 AddView3D(uiapp, doc, altura);
 
-                Form2.FormRender fr = new Form2.FormRender(commandData);
+                List<Element> elem_light = GetElementLight(doc);
+                Form2.FormRender fr = new Form2.FormRender(commandData, elem_light);
                 fr.ShowDialog();
 
                 return Result.Succeeded;
@@ -155,12 +154,12 @@ namespace PixeR
                         Selection sel = uiapp.ActiveUIDocument.Selection;
 
                         XYZ eye = sel.PickPoint("Por favor, escolha a posição da câmera");
-                        eye = new XYZ(eye.X, eye.Y, altura);
+                        eye = new XYZ(eye.X, eye.Y, altura + eye.Z);
 
                         XYZ up = new XYZ(0, 0, 1);
 
                         XYZ lookAt = sel.PickPoint("Por favor, escolha a direção da câmera");
-                        XYZ forward = new XYZ(lookAt.X, lookAt.Y, 0);
+                        XYZ forward = new XYZ(lookAt.X - eye.X, lookAt.Y - eye.Y, 0);
 
                         view3D.SetOrientation(new ViewOrientation3D(eye, up, forward));
                         
@@ -353,6 +352,18 @@ namespace PixeR
             }
 
             return lightTypes;
+        }
+
+        public List<Element> GetElementLight(Document doc)
+        {
+            List<Element> elem_light = new List<Element>();
+            FilteredElementCollector collector = new FilteredElementCollector(doc).WhereElementIsNotElementType();
+            collector.OfClass(typeof(FamilyInstance)).OfCategory(BuiltInCategory.OST_LightingFixtures);
+            foreach (Element e in collector)
+            {
+                elem_light.Add(e);
+            }
+            return elem_light;
         }
 
 

@@ -54,6 +54,9 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FormLight.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="FormRender.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -64,6 +67,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="FormLight.resx">
+      <DependentUpon>FormLight.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="FormRender.resx">
       <DependentUpon>FormRender.cs</DependentUpon>
     </EmbeddedResource>

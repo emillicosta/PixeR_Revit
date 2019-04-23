@@ -15,3 +15,4 @@ C:\Tcc\PixeR_Revit\PixeR\obj\Debug\PixeR.csproj.CoreCompileInputs.cache
 C:\Tcc\PixeR_Revit\PixeR\obj\Debug\PixeR.dll
 C:\Tcc\PixeR_Revit\PixeR\obj\Debug\PixeR.pdb
 C:\Tcc\PixeR_Revit\PixeR\obj\Debug\Form2.FormRender.resources
+C:\Tcc\PixeR_Revit\PixeR\obj\Debug\Form3.FormLight.resources

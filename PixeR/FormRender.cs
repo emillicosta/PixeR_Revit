@@ -1,12 +1,16 @@
 ﻿using System;
 using System.Text.RegularExpressions;
 using Autodesk.Revit.UI;
+using Autodesk.Revit.DB.Lighting;
+using System.Collections.Generic;
+using Autodesk.Revit.DB;
 
 namespace Form2
 {
     public partial class FormRender : System.Windows.Forms.Form
     {
         private ExternalCommandData commandData;
+        private List<Element> lights_on;
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label4;
@@ -36,9 +40,10 @@ namespace Form2
         private System.Windows.Forms.MaskedTextBox maskedTextBox1;
         private System.Windows.Forms.ComboBox comboBox4;
 
-        public FormRender(ExternalCommandData commandData)
+        public FormRender(ExternalCommandData commandData, List<Element> lights)
         {
             this.commandData = commandData;
+            this.lights_on = lights;
             InitializeComponent();
 
         }
@@ -88,6 +93,7 @@ namespace Form2
             this.button2.TabIndex = 0;
             this.button2.Text = "Renderizar";
             this.button2.UseVisualStyleBackColor = true;
+            this.button2.Click += new System.EventHandler(this.Button2_Click);
             // 
             // label3
             // 
@@ -325,6 +331,7 @@ namespace Form2
             this.button3.TabIndex = 7;
             this.button3.Text = "Selecionar";
             this.button3.UseVisualStyleBackColor = true;
+            this.button3.Click += new System.EventHandler(this.Button3_Click);
             // 
             // label9
             // 
@@ -425,5 +432,149 @@ namespace Form2
             }
         }
 
+        private void Button3_Click(object sender, EventArgs e)
+        {
+            Form3.FormLight fl = new Form3.FormLight(commandData, lights_on);
+            fl.ShowDialog();
+            lights_on = fl.GetLights();
+        }
+
+        private void Button2_Click(object sender, EventArgs e)
+        {
+            if (textBox2.Text != "")
+            {
+                if (textBox3.Text != "")
+                {
+                    if (comboBox1.SelectedIndex != -1)
+                    {
+                        if (textBox4.Text != "")
+                        {
+                            if (textBox5.Text != "")
+                            {
+                                if (textBox6.Text != "")
+                                {
+                                    if (comboBox3.SelectedIndex != -1)
+                                    {
+                                        if (maskedTextBox1.Text != "  /  /       :")
+                                        {
+                                            if (textBox8.Text != "")
+                                            {
+                                                if (textBox9.Text != "")
+                                                {
+                                                    if (comboBox4.SelectedIndex != -1)
+                                                    {
+                                                        //TaskDialog.Show("PixeR", textBox2.Text + " " + textBox3.Text + " " + comboBox1.Text + " " + textBox4.Text + " " + textBox5.Text + " " + textBox6 + " " + comboBox3.Text + " -" + maskedTextBox1.Text + "- " + textBox8.Text + " " + textBox9.Text + " " + comboBox4.Text);
+                                                        Close();
+                                                    }
+                                                    else
+                                                    {
+                                                        TaskDialog.Show("PixeR", "Selecione o fundo");
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    TaskDialog.Show("PixeR","Selecione a altitude");
+                                                }
+                                            }
+                                            else
+                                            {
+                                                TaskDialog.Show("PixeR","Selecione a Latitude");
+                                            }
+                                        }
+                                        else
+                                        {
+                                            TaskDialog.Show("P", "Selecione o dia e hora");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        TaskDialog.Show("PixeR", "Selecione o tipo de céu");
+                                    }
+                                }
+                                else
+                                {
+                                    TaskDialog.Show("PixeR", "Selecione o campo distância focal");
+                                }
+                            }
+                            else
+                            {
+                                TaskDialog.Show("PixeR", "Selecione o campo abertura da câmera");
+                            }
+                        }
+                        else
+                        {
+                            TaskDialog.Show("Pixer", "Selecione o campo de visão da câmera!");
+                        }
+                    }
+                    else
+                    {
+                        TaskDialog.Show("PixeR", "Selecione a qualidade");
+                    }
+                }
+                else
+                {
+                    TaskDialog.Show("PixeR", "Preencha o campo largura");
+                }
+            }
+            else
+            {
+                TaskDialog.Show("PixeR", "Preencha o campo altura");
+            }
+        }
+
+        public Double GetAltura()
+        {
+            return Convert.ToDouble(textBox2.Text);
+        }
+
+        public Double GetLargura()
+        {
+            return Convert.ToDouble(textBox3.Text);
+        }
+
+        public String GetQualidade()
+        {
+            return comboBox1.Text;
+        }
+
+        public Double GetCampoVisao()
+        {
+            return Convert.ToDouble(textBox4.Text);
+        }
+
+        public Double GetAbertura()
+        {
+            return Convert.ToDouble(textBox5.Text);
+        }
+
+        public Double GetDistFocal()
+        {
+            return Convert.ToDouble(textBox6.Text);
+        }
+
+        public String GetCeu()
+        {
+            return comboBox3.Text;
+        }
+
+        public String GetDataHora()
+        {
+            return maskedTextBox1.Text;
+        }
+
+        public Double GetLatitude()
+        {
+            return Convert.ToDouble(textBox8.Text);
+        }
+
+        public Double Getlongitude()
+        {
+            return Convert.ToDouble(textBox9.Text);
+        }
+
+        public string Getfundo()
+        {
+            return comboBox4.Text;
+        }
     }
 }
