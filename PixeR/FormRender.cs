@@ -4,6 +4,7 @@ using Autodesk.Revit.UI;
 using Autodesk.Revit.DB.Lighting;
 using System.Collections.Generic;
 using Autodesk.Revit.DB;
+using System.Drawing;
 
 namespace Form2
 {
@@ -39,10 +40,14 @@ namespace Form2
         private System.Windows.Forms.Label label15;
         private System.Windows.Forms.MaskedTextBox maskedTextBox1;
         private System.Windows.Forms.ComboBox comboBox4;
+        private Regex reg = new Regex(@"^-?\d+[.]?\d*$");
+
+        public Regex Reg { get => reg; set => reg = value; }
+        public ExternalCommandData CommandData { get => commandData; set => commandData = value; }
 
         public FormRender(ExternalCommandData commandData, List<Element> lights)
         {
-            this.commandData = commandData;
+            this.CommandData = commandData;
             this.lights_on = lights;
             InitializeComponent();
 
@@ -411,11 +416,14 @@ namespace Form2
             }
         }
 
-        Regex reg = new Regex(@"^-?\d+[.]?\d*$");
         private void TextBox8_KeyPress(object sender, System.Windows.Forms.KeyPressEventArgs e)
         {
-            if (char.IsControl(e.KeyChar)) return;
-            if (!reg.IsMatch(textBox8.Text.Insert(textBox8.SelectionStart, e.KeyChar.ToString()) + "1"))
+            if (char.IsControl(e.KeyChar))
+            {
+                return;
+            }
+
+            if (!Reg.IsMatch(textBox8.Text.Insert(textBox8.SelectionStart, e.KeyChar.ToString()) + "1"))
             {
                 e.Handled = true;
                 return;
@@ -425,7 +433,7 @@ namespace Form2
         private void TextBox9_KeyPress(object sender, System.Windows.Forms.KeyPressEventArgs e)
         {
             if (char.IsControl(e.KeyChar)) return;
-            if (!reg.IsMatch(textBox9.Text.Insert(textBox9.SelectionStart, e.KeyChar.ToString()) + "1"))
+            if (!Reg.IsMatch(textBox9.Text.Insert(textBox9.SelectionStart, e.KeyChar.ToString()) + "1"))
             {
                 e.Handled = true;
                 return;
@@ -434,7 +442,7 @@ namespace Form2
 
         private void Button3_Click(object sender, EventArgs e)
         {
-            Form3.FormLight fl = new Form3.FormLight(commandData, lights_on);
+            Form3.FormLight fl = new Form3.FormLight(CommandData, lights_on);
             fl.ShowDialog();
             lights_on = fl.GetLights();
         }
@@ -464,7 +472,19 @@ namespace Form2
                                                     if (comboBox4.SelectedIndex != -1)
                                                     {
                                                         //TaskDialog.Show("PixeR", textBox2.Text + " " + textBox3.Text + " " + comboBox1.Text + " " + textBox4.Text + " " + textBox5.Text + " " + textBox6 + " " + comboBox3.Text + " -" + maskedTextBox1.Text + "- " + textBox8.Text + " " + textBox9.Text + " " + comboBox4.Text);
-                                                        Close();
+                                                        //Close();
+                                                        Bitmap img = new Bitmap(GetLargura(), GetAltura());
+                                                        System.Drawing.Color newColor = System.Drawing.Color.FromArgb(255, 0, 0);
+                                                        for (int x = 0; x < img.Width; x++)
+                                                        {
+                                                            for (int y = 0; y < img.Height; y++)
+                                                            {
+                                                                img.SetPixel(x, y, newColor);
+                                                            }
+                                                        }
+
+                                                        Form4.FormsImage fi = new Form4.FormsImage(img);
+                                                        fi.ShowDialog();
                                                     }
                                                     else
                                                     {
@@ -522,14 +542,14 @@ namespace Form2
             }
         }
 
-        public Double GetAltura()
+        public int GetAltura()
         {
-            return Convert.ToDouble(textBox2.Text);
+            return Convert.ToInt32(textBox2.Text);
         }
 
-        public Double GetLargura()
+        public int GetLargura()
         {
-            return Convert.ToDouble(textBox3.Text);
+            return Convert.ToInt32(textBox3.Text);
         }
 
         public String GetQualidade()
@@ -572,7 +592,7 @@ namespace Form2
             return Convert.ToDouble(textBox9.Text);
         }
 
-        public string Getfundo()
+        public string GetBackGround()
         {
             return comboBox4.Text;
         }

@@ -1,27 +1,18 @@
 ﻿using System;
-using System.Reflection;
-using System.Linq;
 using Autodesk.Revit.UI;
-using Autodesk.Revit.DB;
-using Autodesk.Revit.Attributes;
-using System.Windows.Media.Imaging;
-using Autodesk.Revit.UI.Selection;
-using System.Drawing;
 
 namespace Form1
 {
-    public partial class WinForm : System.Windows.Forms.Form
+    public partial class FormsImage : System.Windows.Forms.Form
     {
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.Label label2;
-        private ExternalCommandData commandData;
         private Double z;
 
-        public WinForm(ExternalCommandData commandData)
+        public FormsImage()
         {
-            this.commandData = commandData;
             InitializeComponent();
 
         }
@@ -42,7 +33,7 @@ namespace Form1
             this.button1.TabIndex = 0;
             this.button1.Text = "Ok";
             this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.button1.Click += new System.EventHandler(this.Button1_Click);
             // 
             // label1
             // 
@@ -59,7 +50,7 @@ namespace Form1
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(57, 20);
             this.textBox1.TabIndex = 2;
-            this.textBox1.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.textBox1_KeyPress);
+            this.textBox1.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.TextBox1_KeyPress);
             // 
             // label2
             // 
@@ -83,7 +74,7 @@ namespace Form1
 
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void Button1_Click(object sender, EventArgs e)
         {
             if (textBox1.Text != null && textBox1.Text != "")
             {
@@ -96,21 +87,13 @@ namespace Form1
             }
         }
 
-        public Double getZ()
+        public Double GetZ()
         {
             return this.z;
         }
 
-        // private void textBox1_TextChanged(object sender, EventArgs e)
-        // {
-        //   if (System.Text.RegularExpressions.Regex.IsMatch(textBox1.Text, "[^0-9]"))
-        //   {
-        //     TaskDialog.Show("PixeR", "Por favor, apenas números.");
-        //    textBox1.Text = textBox1.Text.Remove(textBox1.Text.Length - 1);
-        //}
-        //}
 
-        private void textBox1_KeyPress(object sender, System.Windows.Forms.KeyPressEventArgs e)
+        private void TextBox1_KeyPress(object sender, System.Windows.Forms.KeyPressEventArgs e)
         {
             // Verify that the pressed key isn't CTRL or any non-numeric digit
             if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar) && (e.KeyChar != ','))

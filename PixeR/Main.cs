@@ -12,6 +12,7 @@ using Autodesk.Revit.UI.Selection;
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB.Visual;
 using Autodesk.Revit.DB.Lighting;
+using Autodesk.Revit.DB.DirectContext3D;
 
 namespace PixeR
 {
@@ -112,15 +113,26 @@ namespace PixeR
                     
                 }
 
-                Form1.WinForm wf = new Form1.WinForm(commandData);
+                Form1.FormsImage wf = new Form1.FormsImage();
                 wf.ShowDialog();
-                Double altura = wf.getZ() / 30;//nº 30 foi tentativa e erro
+                Double altura = wf.GetZ() / 30;//nº 30 foi tentativa e erro
 
                 AddView3D(uiapp, doc, altura);
 
                 List<Element> elem_light = GetElementLight(doc);
                 Form2.FormRender fr = new Form2.FormRender(commandData, elem_light);
                 fr.ShowDialog();
+                int height = fr.GetAltura();
+                int width = fr.GetLargura();
+                String qualidade = fr.GetQualidade();
+                double campoVisao = fr.GetCampoVisao();
+                double abertura = fr.GetAbertura();
+                double distFocal = fr.GetDistFocal();
+                String ceu = fr.GetCeu();
+                String dataHora = fr.GetDataHora();
+                double latitude = fr.GetLatitude();
+                double longitude = fr.Getlongitude();
+                string backGroud = fr.GetBackGround();
 
                 return Result.Succeeded;
                 
@@ -257,69 +269,11 @@ namespace PixeR
             {
                 ElementId elementId = face.MaterialElementId;
                 Material m = doc.GetElement(elementId) as Material;
-                if (m != null)
-                {
-                    //GetMaterialInformation(m);
-                    materiais.Add(m);
-                }
+                materiais.Add(m);
             }
 
             return materiais;
             //TaskDialog.Show("Revit", faceInfo);
-        }
-
-        private void GetMaterialInformation(Material material)
-        {
-            StringBuilder message = new StringBuilder("Material : " + material.Name);
-            //color of the material
-            message.Append(string.Format("\nColor: Red[{0}]; Green[{1}]; Blue[{2}]",
-                            material.Color.Red, material.Color.Green, material.Color.Blue));
-
-            //foreground cut pattern and pattern color of the material
-            FillPatternElement cutForegroundPattern = material.Document.GetElement(material.CutForegroundPatternId) as FillPatternElement;
-            if (null != cutForegroundPattern)
-            {
-                message.Append("\nCut Foreground Pattern: " + cutForegroundPattern.Name);
-                message.Append(string.Format("\nCut Foreground Pattern Color: Red[{0}]; Green[{1}]; Blue[{2}]",
-                                material.CutForegroundPatternColor.Red, material.CutForegroundPatternColor.Green, material.CutForegroundPatternColor.Blue));
-            }
-
-            //foreground surface pattern and pattern color of the material
-            FillPatternElement surfaceForegroundPattern = material.Document.GetElement(material.SurfaceForegroundPatternId) as FillPatternElement;
-            if (null != surfaceForegroundPattern)
-            {
-                message.Append("\nSurface Foreground Pattern: " + surfaceForegroundPattern.Name);
-                message.Append(string.Format("\nSurface Foreground Pattern Color: Red[{0}]; Green[{1}]; Blue[{2}]",
-                                material.SurfaceForegroundPatternColor.Red, material.SurfaceForegroundPatternColor.Green, material.SurfaceForegroundPatternColor.Blue));
-            }
-
-            //background cut pattern and pattern color of the material
-            FillPatternElement cutBackgroundPattern = material.Document.GetElement(material.CutBackgroundPatternId) as FillPatternElement;
-            if (null != cutBackgroundPattern)
-            {
-                message.Append("\nCut Background Pattern: " + cutBackgroundPattern.Name);
-                message.Append(string.Format("\nCut Background Pattern Color: Red[{0}]; Green[{1}]; Blue[{2}]",
-                                material.CutBackgroundPatternColor.Red, material.CutBackgroundPatternColor.Green, material.CutBackgroundPatternColor.Blue));
-            }
-
-            //background surface pattern and pattern color of the material
-            FillPatternElement surfaceBackgroundPattern = material.Document.GetElement(material.SurfaceBackgroundPatternId) as FillPatternElement;
-            if (null != surfaceBackgroundPattern)
-            {
-                message.Append("\nSurface Background Pattern: " + surfaceBackgroundPattern.Name);
-                message.Append(string.Format("\nSurface Background Pattern Color: Red[{0}]; Green[{1}]; Blue[{2}]",
-                                material.SurfaceBackgroundPatternColor.Red, material.SurfaceBackgroundPatternColor.Green, material.SurfaceBackgroundPatternColor.Blue));
-            }
-
-            //some shading property of the material
-            int shininess = material.Shininess;
-            message.Append("\nShininess: " + shininess);
-            int smoothness = material.Smoothness;
-            message.Append("\nSmoothness: " + smoothness);
-            int transparency = material.Transparency;
-            message.Append("\nTransparency: " + transparency);
-
-            //TaskDialog.Show("Revit", message.ToString());
         }
 
         public List<LightType> GetLightsData(Document document)

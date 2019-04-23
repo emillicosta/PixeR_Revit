@@ -9,10 +9,12 @@ C:\Tcc\PixeR\PixeR\obj\Debug\PixeR.csproj.GenerateResource.cache
 C:\Tcc\PixeR_Revit\PixeR\bin\Debug\PixeR.dll
 C:\Tcc\PixeR_Revit\PixeR\bin\Debug\PixeR.pdb
 C:\Tcc\PixeR_Revit\PixeR\obj\Debug\PixeR.csprojAssemblyReference.cache
-C:\Tcc\PixeR_Revit\PixeR\obj\Debug\Form1.WinForm.resources
 C:\Tcc\PixeR_Revit\PixeR\obj\Debug\PixeR.csproj.GenerateResource.cache
 C:\Tcc\PixeR_Revit\PixeR\obj\Debug\PixeR.csproj.CoreCompileInputs.cache
 C:\Tcc\PixeR_Revit\PixeR\obj\Debug\PixeR.dll
 C:\Tcc\PixeR_Revit\PixeR\obj\Debug\PixeR.pdb
 C:\Tcc\PixeR_Revit\PixeR\obj\Debug\Form2.FormRender.resources
 C:\Tcc\PixeR_Revit\PixeR\obj\Debug\Form3.FormLight.resources
+C:\Tcc\PixeR_Revit\PixeR\obj\Debug\Form4.FormsImage.resources
+C:\Tcc\PixeR_Revit\PixeR\obj\Debug\PixeR.Properties.Resources.resources
+C:\Tcc\PixeR_Revit\PixeR\obj\Debug\Form1.FormsImage.resources
