@@ -19,6 +19,7 @@ namespace Form1
 
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormsImage));
             this.button1 = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.textBox1 = new System.Windows.Forms.TextBox();
@@ -61,14 +62,16 @@ namespace Form1
             this.label2.TabIndex = 3;
             this.label2.Text = "cm";
             // 
-            // WinForm
+            // FormsImage
             // 
             this.ClientSize = new System.Drawing.Size(241, 99);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.textBox1);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.button1);
-            this.Name = "WinForm";
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.Name = "FormsImage";
+            this.Text = "PixeR";
             this.ResumeLayout(false);
             this.PerformLayout();
 

@@ -70,6 +70,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Psa\Psa.cs" />
     <Compile Include="WinForm.cs">
       <SubType>Form</SubType>
     </Compile>

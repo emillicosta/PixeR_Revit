@@ -144,6 +144,7 @@ namespace Form2
             this.comboBox1.Name = "comboBox1";
             this.comboBox1.Size = new System.Drawing.Size(121, 21);
             this.comboBox1.TabIndex = 5;
+            this.comboBox1.SelectedIndex = 0;
             // 
             // label5
             // 
@@ -191,6 +192,7 @@ namespace Form2
             this.textBox6.Name = "textBox6";
             this.textBox6.Size = new System.Drawing.Size(44, 20);
             this.textBox6.TabIndex = 8;
+            this.textBox6.Text = "5";
             this.textBox6.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.TextBox1_KeyPress_double);
             // 
             // textBox5
@@ -199,6 +201,7 @@ namespace Form2
             this.textBox5.Name = "textBox5";
             this.textBox5.Size = new System.Drawing.Size(44, 20);
             this.textBox5.TabIndex = 7;
+            this.textBox5.Text = "0";
             this.textBox5.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.TextBox1_KeyPress_double);
             // 
             // textBox4
@@ -207,6 +210,7 @@ namespace Form2
             this.textBox4.Name = "textBox4";
             this.textBox4.Size = new System.Drawing.Size(44, 20);
             this.textBox4.TabIndex = 6;
+            this.textBox4.Text = "20";
             this.textBox4.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.TextBox1_KeyPress_double);
             // 
             // label8
@@ -270,6 +274,7 @@ namespace Form2
             this.textBox9.Name = "textBox9";
             this.textBox9.Size = new System.Drawing.Size(44, 20);
             this.textBox9.TabIndex = 16;
+            this.textBox9.Text = "10";
             this.textBox9.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.TextBox9_KeyPress);
             // 
             // label14
@@ -287,6 +292,7 @@ namespace Form2
             this.textBox8.Name = "textBox8";
             this.textBox8.Size = new System.Drawing.Size(44, 20);
             this.textBox8.TabIndex = 14;
+            this.textBox8.Text = "10";
             this.textBox8.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.TextBox8_KeyPress);
             // 
             // label13
@@ -318,6 +324,7 @@ namespace Form2
             this.comboBox3.Name = "comboBox3";
             this.comboBox3.Size = new System.Drawing.Size(121, 21);
             this.comboBox3.TabIndex = 9;
+            this.comboBox3.SelectedIndex = 0;
             // 
             // label10
             // 
@@ -367,6 +374,7 @@ namespace Form2
             this.comboBox4.Name = "comboBox4";
             this.comboBox4.Size = new System.Drawing.Size(121, 21);
             this.comboBox4.TabIndex = 17;
+            this.comboBox4.SelectedIndex = 0;
             // 
             // FormRender
             // 
@@ -379,6 +387,7 @@ namespace Form2
             this.Controls.Add(this.button2);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "FormRender";
+            this.Text = "PixeR";
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);
@@ -463,8 +472,16 @@ namespace Form2
                                 {
                                     if (comboBox3.SelectedIndex != -1)
                                     {
-                                        if (maskedTextBox1.Text != "  /  /       :")
+                                        string[] diaMes = maskedTextBox1.Text.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+
+                                        string[] AnoHora = diaMes[2].Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+
+                                        string[] horaMin = AnoHora[1].Split(new char[] { ':' }, StringSplitOptions.RemoveEmptyEntries);
+
+
+                                        if (diaMes.Length == 3 && AnoHora.Length == 2 && horaMin.Length == 2)
                                         {
+                                            
                                             if (textBox8.Text != "")
                                             {
                                                 if (textBox9.Text != "")
@@ -472,7 +489,17 @@ namespace Form2
                                                     if (comboBox4.SelectedIndex != -1)
                                                     {
                                                         //TaskDialog.Show("PixeR", textBox2.Text + " " + textBox3.Text + " " + comboBox1.Text + " " + textBox4.Text + " " + textBox5.Text + " " + textBox6 + " " + comboBox3.Text + " -" + maskedTextBox1.Text + "- " + textBox8.Text + " " + textBox9.Text + " " + comboBox4.Text);
-                                                        //Close();
+                                                        
+                                                        int dia = Convert.ToInt32(diaMes[0]);
+                                                        int mes = Convert.ToInt32(diaMes[1]);
+                                                        int ano = Convert.ToInt32(AnoHora[0]);
+                                                        int hora = Convert.ToInt32(horaMin[0]);
+                                                        int min = Convert.ToInt32(horaMin[1]);
+
+                                                        Psa.Psa posicaoSol = new Psa.Psa(GetLatitude(), Getlongitude(), dia, mes, ano, hora, min);
+                                                        XYZ sol = posicaoSol.GetPosicao();
+                                                        TaskDialog.Show("PixeR - posição do sol", sol.ToString());
+
                                                         Bitmap img = new Bitmap(GetLargura(), GetAltura());
                                                         System.Drawing.Color newColor = System.Drawing.Color.FromArgb(255, 0, 0);
                                                         for (int x = 0; x < img.Width; x++)
