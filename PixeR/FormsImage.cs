@@ -49,7 +49,13 @@ namespace Form4
             // 
             // FormsImage
             // 
-            this.ClientSize = new System.Drawing.Size(bitmap.Width+10, bitmap.Height+50);
+            if (bitmap.Width > 75 ) {
+                this.ClientSize = new System.Drawing.Size(bitmap.Width + 10, bitmap.Height + 50);
+            }
+            else
+            {
+                this.ClientSize = new Size(85, bitmap.Height + 50);
+            }
             this.Controls.Add(this.pictureBox1);
             this.Controls.Add(this.button1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));

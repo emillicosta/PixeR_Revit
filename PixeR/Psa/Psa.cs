@@ -14,14 +14,16 @@ namespace Psa
         private readonly int hora;
         private readonly int minuto;
 
-        private double meridian = 3*15;
+        private double meridian = -3*15;
         private int correctedYear;
         private int correctedMonth;
         private double solarMinutesAfterMidnight;
         private double t, G, C, L, alpha, obliquity, declination, hourAngle, altitudeAngle;
-        private double grausParaRadianos = Math.PI / 180;
-        private double radianosParaGraus = 180 / Math.PI;
-        
+        private double grausParaRadianos = 3.1415927 / 180;
+        private double radianosParaGraus = 180 / 3.1415927;
+        private double daylightAdjustment = 0;
+        private double inputMinutesAfterMidnight;
+
 
         public Psa(double latitude, double longitude, int dia, int mes, int ano, int hora, int minuto)
         {
@@ -44,19 +46,16 @@ namespace Psa
                         (Math.Cos(altitudeAngle * grausParaRadianos) *
                          Math.Cos(latitude * grausParaRadianos)));
 
-            if (azimuthAngle * hourAngle < 0)
-            {
-                azimuthAngle *= -1;
-            };
+            if (azimuthAngle * hourAngle < 0) { azimuthAngle *= -1; };
 
             return azimuthAngle;
         }
 
         public double GetAltura()
         {
-            double inputMinutesAfterMidnight = 60 * hora + minuto;
+            inputMinutesAfterMidnight = 60 * hora + minuto;
             solarMinutesAfterMidnight = 12 * 60;
-            solarMinutesAfterMidnight = inputMinutesAfterMidnight + (4 * (longitude - meridian));
+            solarMinutesAfterMidnight = inputMinutesAfterMidnight + (4 * (longitude - meridian)) + daylightAdjustment;
             if (mes > 2)
             {
                 correctedYear = ano;
@@ -84,14 +83,17 @@ namespace Psa
 
             declination = Math.Atan(Math.Tan(obliquity * grausParaRadianos) * Math.Sin(alpha * grausParaRadianos)) * radianosParaGraus;
 
+            // hour angle
             hourAngle = (solarMinutesAfterMidnight - 12 * 60) / 4 * -1;
 
+            // altitude angle  
             altitudeAngle = radianosParaGraus * Math.Asin(
-                        (Math.Cos(latitude * grausParaRadianos) *
-                         Math.Cos(declination * grausParaRadianos) *
-                         Math.Cos(hourAngle * grausParaRadianos)) +
-                        (Math.Sin(latitude * grausParaRadianos) *
-                         Math.Sin(declination * grausParaRadianos)));
+                            (Math.Cos(latitude * grausParaRadianos) *
+                             Math.Cos(declination * grausParaRadianos) *
+                             Math.Cos(hourAngle * grausParaRadianos)) +
+                            (Math.Sin(latitude * grausParaRadianos) *
+                             Math.Sin(declination * grausParaRadianos)));
+
             return altitudeAngle;
         }
 
@@ -102,8 +104,6 @@ namespace Psa
             int r = 149600000; //distancia da terra com o sol
             double altura = GetAltura();
             double azimute = GetAAzimute();
-
-            TaskDialog.Show("Axitume e altura", azimute + " " + altura);
 
             double x = r * Math.Cos(azimute) * Math.Sin(altura);
             double y = r * Math.Sin(azimute) * Math.Sin(altura); ;

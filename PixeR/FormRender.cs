@@ -40,7 +40,7 @@ namespace Form2
         private System.Windows.Forms.Label label15;
         private System.Windows.Forms.MaskedTextBox maskedTextBox1;
         private System.Windows.Forms.ComboBox comboBox4;
-        private Regex reg = new Regex(@"^-?\d+[.]?\d*$");
+        private Regex reg = new Regex(@"^-?\d+[,]?\d*$");
 
         public Regex Reg { get => reg; set => reg = value; }
         public ExternalCommandData CommandData { get => commandData; set => commandData = value; }
@@ -161,6 +161,7 @@ namespace Form2
             this.textBox3.Name = "textBox3";
             this.textBox3.Size = new System.Drawing.Size(44, 20);
             this.textBox3.TabIndex = 3;
+            this.textBox3.Text = "100";
             this.textBox3.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.TextBox1_KeyPress);
             // 
             // textBox2
@@ -169,6 +170,7 @@ namespace Form2
             this.textBox2.Name = "textBox2";
             this.textBox2.Size = new System.Drawing.Size(44, 20);
             this.textBox2.TabIndex = 2;
+            this.textBox2.Text = "100";
             this.textBox2.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.TextBox1_KeyPress);
             // 
             // groupBox2
@@ -275,6 +277,7 @@ namespace Form2
             this.textBox9.Size = new System.Drawing.Size(44, 20);
             this.textBox9.TabIndex = 16;
             this.textBox9.Text = "10";
+            this.textBox9.Text = "-35,2";
             this.textBox9.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.TextBox9_KeyPress);
             // 
             // label14
@@ -293,6 +296,7 @@ namespace Form2
             this.textBox8.Size = new System.Drawing.Size(44, 20);
             this.textBox8.TabIndex = 14;
             this.textBox8.Text = "10";
+            this.textBox8.Text = "-5,7";
             this.textBox8.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.TextBox8_KeyPress);
             // 
             // label13
@@ -498,7 +502,6 @@ namespace Form2
 
                                                         Psa.Psa posicaoSol = new Psa.Psa(GetLatitude(), Getlongitude(), dia, mes, ano, hora, min);
                                                         XYZ sol = posicaoSol.GetPosicao();
-                                                        TaskDialog.Show("PixeR - posição do sol", sol.ToString());
 
                                                         Bitmap img = new Bitmap(GetLargura(), GetAltura());
                                                         System.Drawing.Color newColor = System.Drawing.Color.FromArgb(255, 0, 0);
