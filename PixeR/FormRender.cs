@@ -10,8 +10,6 @@ namespace Form2
 {
     public partial class FormRender : System.Windows.Forms.Form
     {
-        private ExternalCommandData commandData;
-        private List<Element> lights_on;
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label4;
@@ -40,15 +38,22 @@ namespace Form2
         private System.Windows.Forms.Label label15;
         private System.Windows.Forms.MaskedTextBox maskedTextBox1;
         private System.Windows.Forms.ComboBox comboBox4;
+
         private Regex reg = new Regex(@"^-?\d+[,]?\d*$");
+        private ExternalCommandData commandData;
+        private List<Element> lights_on;
+        private List<List<Face>> allFaces;
 
         public Regex Reg { get => reg; set => reg = value; }
         public ExternalCommandData CommandData { get => commandData; set => commandData = value; }
 
-        public FormRender(ExternalCommandData commandData, List<Element> lights)
+        public FormRender(ExternalCommandData commandData, List<Element> lights, List<List<Face>> allFaces)
         {
             this.CommandData = commandData;
             this.lights_on = lights;
+            this.allFaces = allFaces;
+
+
             InitializeComponent();
 
         }
@@ -406,7 +411,7 @@ namespace Form2
         private void TextBox1_KeyPress(object sender, System.Windows.Forms.KeyPressEventArgs e)
         {
             // Verify that the pressed key isn't CTRL or any non-numeric digit
-            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar) )
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
             {
                 e.Handled = true;
             }
@@ -485,7 +490,7 @@ namespace Form2
 
                                         if (diaMes.Length == 3 && AnoHora.Length == 2 && horaMin.Length == 2)
                                         {
-                                            
+
                                             if (textBox8.Text != "")
                                             {
                                                 if (textBox9.Text != "")
@@ -493,7 +498,7 @@ namespace Form2
                                                     if (comboBox4.SelectedIndex != -1)
                                                     {
                                                         //TaskDialog.Show("PixeR", textBox2.Text + " " + textBox3.Text + " " + comboBox1.Text + " " + textBox4.Text + " " + textBox5.Text + " " + textBox6 + " " + comboBox3.Text + " -" + maskedTextBox1.Text + "- " + textBox8.Text + " " + textBox9.Text + " " + comboBox4.Text);
-                                                        
+
                                                         int dia = Convert.ToInt32(diaMes[0]);
                                                         int mes = Convert.ToInt32(diaMes[1]);
                                                         int ano = Convert.ToInt32(AnoHora[0]);
@@ -503,17 +508,9 @@ namespace Form2
                                                         Psa.Psa posicaoSol = new Psa.Psa(GetLatitude(), Getlongitude(), dia, mes, ano, hora, min);
                                                         XYZ sol = posicaoSol.GetPosicao();
 
-                                                        Bitmap img = new Bitmap(GetLargura(), GetAltura());
-                                                        System.Drawing.Color newColor = System.Drawing.Color.FromArgb(255, 0, 0);
-                                                        for (int x = 0; x < img.Width; x++)
-                                                        {
-                                                            for (int y = 0; y < img.Height; y++)
-                                                            {
-                                                                img.SetPixel(x, y, newColor);
-                                                            }
-                                                        }
+                                                        Bitmap imagem = GetImage(sol);
 
-                                                        Form4.FormsImage fi = new Form4.FormsImage(img);
+                                                        Form4.FormsImage fi = new Form4.FormsImage(imagem);
                                                         fi.ShowDialog();
                                                     }
                                                     else
@@ -523,12 +520,12 @@ namespace Form2
                                                 }
                                                 else
                                                 {
-                                                    TaskDialog.Show("PixeR","Selecione a altitude");
+                                                    TaskDialog.Show("PixeR", "Selecione a altitude");
                                                 }
                                             }
                                             else
                                             {
-                                                TaskDialog.Show("PixeR","Selecione a Latitude");
+                                                TaskDialog.Show("PixeR", "Selecione a Latitude");
                                             }
                                         }
                                         else
@@ -625,6 +622,87 @@ namespace Form2
         public string GetBackGround()
         {
             return comboBox4.Text;
+        }
+
+        public Bitmap GetImage(XYZ posicaoSol)
+        {
+            //pegando os dados
+            Document doc = commandData.Application.ActiveUIDocument.Document;
+            int largura = GetLargura();
+            int altura = GetAltura();
+            int nSamples = 0, ray_depth = 0;
+            if (GetQualidade() == "Baixa")
+            {
+                nSamples = 10; ray_depth = 10;
+            }
+            else if (GetQualidade() == "Média")
+            {
+                nSamples = 50; ray_depth = 50;
+
+            }
+            else if (GetQualidade() == "Alta")
+            {
+                nSamples = 100; ray_depth = 100;
+            }
+            double t_min = 0.00001, t_max = double.PositiveInfinity;
+
+            XYZ topleft;
+            XYZ topRight;
+            XYZ bottonLeft;
+            XYZ bottonRight;
+            if (GetBackGround() == "Céu")
+            {
+                topleft = new XYZ(1, 1, 1);
+                topRight = new XYZ(1, 1, 1);
+                bottonLeft = new XYZ(1, 0, 1);
+                bottonRight = new XYZ(1, 0, 1);
+            }
+            else
+            {
+                topleft = new XYZ(0, 0, 0);
+                topRight = new XYZ(0, 0, 0);
+                bottonLeft = new XYZ(0, 0, 0);
+                bottonRight = new XYZ(0, 0, 0);
+            }
+            PlanoFundo bg = new PlanoFundo(topleft, topRight, bottonLeft, bottonRight);
+
+            List<Objeto> objetos = new List<Objeto>();
+            /*foreach (List<Face> faces in allFaces)
+            {
+                foreach (Face face in faces)
+                {
+                    Mesh mesh = face.Triangulate();
+                    meshes.Add(mesh);
+                    ElementId elementId = face.MaterialElementId;
+                    Material m = doc.GetElement(elementId) as Material;
+                }
+                //allMaterial.Add(GetMaterialFace(faces, doc));
+            }*/
+
+            XYZ luzAmbiente = new XYZ(0.1,0.1,0.1);
+
+            List<Luzes> luzes = new List<Luzes>();
+            //adiciona o sol
+            PointLight sol = new PointLight(posicaoSol, new XYZ(1,1,1));
+            luzes.Add(sol);
+            //adiciona luzes artificiais
+
+            Scene world = new Scene(objetos, luzes, bg, luzAmbiente);
+
+            Shader shader = new LambertianShader(world);
+
+            View3D view = doc.ActiveView as View3D;
+
+            //GetOrientation()
+            PerspectiveCamera cam = new PerspectiveCamera(view.GetOrientation().EyePosition, view.GetOrientation().ForwardDirection, view.GetOrientation().UpDirection, GetCampoVisao(), largura/altura, GetAbertura(), GetDistFocal());
+
+            Raytrace raytrace = new Raytrace();
+            Bitmap img = raytrace.Render(cam, world, shader, largura, altura, nSamples, ray_depth, t_min, t_max);
+
+
+            //montando a imagem
+
+            return img;
         }
     }
 }

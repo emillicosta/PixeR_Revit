@@ -73,7 +73,6 @@ namespace PixeR
                     allMesh.Add(GetMesh(f));
                 }
 
-
                 List<List<Material>> allMaterial = new List<List<Material>>();
                 foreach (List<Face> f in allFaces)
                 {
@@ -82,10 +81,7 @@ namespace PixeR
 
                 List<LightType> lights = GetLightsData(doc);
 
-
-                //exibir a malha e o material da malha todos
-
-
+                //APAGAR- exibir a malha e o material da malha todos
                 if (allMaterial.Count == elem.Count)
                 {
                     String mensagem = "";
@@ -120,19 +116,8 @@ namespace PixeR
                 AddView3D(uiapp, doc, altura);
 
                 List<Element> elem_light = GetElementLight(doc);
-                Form2.FormRender fr = new Form2.FormRender(commandData, elem_light);
+                Form2.FormRender fr = new Form2.FormRender(commandData, elem_light, allFaces);
                 fr.ShowDialog();
-                int height = fr.GetAltura();
-                int width = fr.GetLargura();
-                String qualidade = fr.GetQualidade();
-                double campoVisao = fr.GetCampoVisao();
-                double abertura = fr.GetAbertura();
-                double distFocal = fr.GetDistFocal();
-                String ceu = fr.GetCeu();
-                String dataHora = fr.GetDataHora();
-                double latitude = fr.GetLatitude();
-                double longitude = fr.Getlongitude();
-                string backGroud = fr.GetBackGround();
 
                 return Result.Succeeded;
                 

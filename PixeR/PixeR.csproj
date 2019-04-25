@@ -63,6 +63,14 @@
     <Compile Include="FormsImage.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="HitRecord.cs" />
+    <Compile Include="LambertianShader.cs" />
+    <Compile Include="Luzes.cs" />
+    <Compile Include="MyMaterial.cs" />
+    <Compile Include="Objeto.cs" />
+    <Compile Include="PerspectiveCamera.cs" />
+    <Compile Include="PlanoFundo.cs" />
+    <Compile Include="PointLight.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -71,6 +79,11 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="Psa\Psa.cs" />
+    <Compile Include="Ray.cs" />
+    <Compile Include="Raytrace.cs" />
+    <Compile Include="Scene.cs" />
+    <Compile Include="Shader.cs" />
+    <Compile Include="Texture.cs" />
     <Compile Include="WinForm.cs">
       <SubType>Form</SubType>
     </Compile>
