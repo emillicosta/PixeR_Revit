@@ -27,7 +27,7 @@ namespace Form2
                         hue += shader.color(r, t_min, t_max, ray_depth);
                     }
 
-                    hue = hue / Convert.ToDouble(n_samples);
+                    hue /= Convert.ToDouble(n_samples);
                    
                     hue = new XYZ(Math.Sqrt(hue.X), Math.Sqrt(hue.Y), Math.Sqrt(hue.Z));
                     int ir = Convert.ToInt32(255 * hue.X);

@@ -42,10 +42,10 @@ namespace Form2
                 return emitted;
             }
             // Else, dye the pixel with the background color
-            // return Shader.interpolation_biline(r_);
+            return Shader.vertical_interpolation(r_, Shader.world.bg.lower_left, Shader.world.bg.top_left);
             //XYZ colorido = Shader.vertical_interpolation(r_, Shader.world.bg.lower_left, Shader.world.bg.top_left);
             XYZ ray = r_.GetDirection().Normalize();
-            double ray_y = ray.Y;    
+            double ray_y = ray.Y;
             double t = (1 + ray_y) * 0.5;   
             XYZ result = Shader.world.bg.lower_left * (1 - t) + Shader.world.bg.top_left * (t);
             return result;

@@ -26,7 +26,7 @@ namespace Form2
             return hit_anything;
         }
 
-       public XYZ vertical_interpolation(Ray r_, XYZ bottom_, XYZ top_)
+       public static XYZ vertical_interpolation(Ray r_, XYZ bottom_, XYZ top_)
         {
             // Make the ray a vector in the same direction.     
             XYZ ray = r_.GetDirection().Normalize();
@@ -43,7 +43,7 @@ namespace Form2
          * Calculates the horizontal interpolation between 2 colors
          * Only works with the aspect ratio [2:1]
          */
-       public XYZ horizontal_interpolation(Ray r_, XYZ left_, XYZ right_)
+       public static XYZ horizontal_interpolation(Ray r_, XYZ left_, XYZ right_)
         {
             // Make the ray a vector in the same direction.     
             XYZ ray = r_.GetDirection().Normalize();

@@ -20,7 +20,7 @@ namespace Form2
             w = w.Normalize();
             u = vup_.CrossProduct(w);
             u = u.Normalize();
-            v = w.CrossProduct(u);
+            v = w.CrossProduct(u).Normalize();
 
             lens_radius = aperture_ / 2;
             double theta = fov_ * (Math.PI/180); // Radian transformation

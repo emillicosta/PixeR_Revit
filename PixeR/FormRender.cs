@@ -43,15 +43,17 @@ namespace Form2
         private ExternalCommandData commandData;
         private List<Element> lights_on;
         private List<List<Face>> allFaces;
+        private List<XYZ> listCam;
 
         public Regex Reg { get => reg; set => reg = value; }
         public ExternalCommandData CommandData { get => commandData; set => commandData = value; }
 
-        public FormRender(ExternalCommandData commandData, List<Element> lights, List<List<Face>> allFaces)
+        public FormRender(ExternalCommandData commandData, List<Element> lights, List<List<Face>> allFaces, List<XYZ> listCam)
         {
             this.CommandData = commandData;
             this.lights_on = lights;
             this.allFaces = allFaces;
+            this.listCam = listCam;
 
 
             InitializeComponent();
@@ -166,7 +168,7 @@ namespace Form2
             this.textBox3.Name = "textBox3";
             this.textBox3.Size = new System.Drawing.Size(44, 20);
             this.textBox3.TabIndex = 3;
-            this.textBox3.Text = "100";
+            this.textBox3.Text = "600";
             this.textBox3.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.TextBox1_KeyPress);
             // 
             // textBox2
@@ -175,7 +177,7 @@ namespace Form2
             this.textBox2.Name = "textBox2";
             this.textBox2.Size = new System.Drawing.Size(44, 20);
             this.textBox2.TabIndex = 2;
-            this.textBox2.Text = "100";
+            this.textBox2.Text = "300";
             this.textBox2.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.TextBox1_KeyPress);
             // 
             // groupBox2
@@ -273,6 +275,7 @@ namespace Form2
             this.maskedTextBox1.Name = "maskedTextBox1";
             this.maskedTextBox1.Size = new System.Drawing.Size(123, 20);
             this.maskedTextBox1.TabIndex = 9;
+            this.maskedTextBox1.Text = "110320190800";
             this.maskedTextBox1.ValidatingType = typeof(System.DateTime);
             // 
             // textBox9
@@ -281,7 +284,6 @@ namespace Form2
             this.textBox9.Name = "textBox9";
             this.textBox9.Size = new System.Drawing.Size(44, 20);
             this.textBox9.TabIndex = 16;
-            this.textBox9.Text = "10";
             this.textBox9.Text = "-35,2";
             this.textBox9.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.TextBox9_KeyPress);
             // 
@@ -300,7 +302,6 @@ namespace Form2
             this.textBox8.Name = "textBox8";
             this.textBox8.Size = new System.Drawing.Size(44, 20);
             this.textBox8.TabIndex = 14;
-            this.textBox8.Text = "10";
             this.textBox8.Text = "-5,7";
             this.textBox8.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.TextBox8_KeyPress);
             // 
@@ -627,7 +628,7 @@ namespace Form2
         public Bitmap GetImage(XYZ posicaoSol)
         {
             //pegando os dados
-            Document doc = commandData.Application.ActiveUIDocument.Document;
+            _ = commandData.Application.ActiveUIDocument.Document;
             int largura = GetLargura();
             int altura = GetAltura();
             int nSamples = 0, ray_depth = 0;
@@ -691,10 +692,11 @@ namespace Form2
 
             Shader shader = new LambertianShader(world);
 
-            View3D view = doc.ActiveView as View3D;
+            XYZ eye = new XYZ(listCam[0].X, listCam[0].Z, listCam[0].Y*-1);
+            XYZ direction = new XYZ(listCam[1].X, listCam[0].Z, listCam[1].Y*-1);
 
             //GetOrientation()
-            PerspectiveCamera cam = new PerspectiveCamera(view.GetOrientation().EyePosition, view.GetOrientation().ForwardDirection, view.GetOrientation().UpDirection, GetCampoVisao(), largura/altura, GetAbertura(), GetDistFocal());
+            PerspectiveCamera cam = new PerspectiveCamera(eye, direction, new XYZ(0,1,0), GetCampoVisao(), largura/altura, GetAbertura(), GetDistFocal());
 
             Raytrace raytrace = new Raytrace();
             Bitmap img = raytrace.Render(cam, world, shader, largura, altura, nSamples, ray_depth, t_min, t_max);

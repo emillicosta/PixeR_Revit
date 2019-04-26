@@ -59,6 +59,15 @@ namespace PixeR
                 UIApplication uiapp = commandData.Application;
                 Document doc = uiapp.ActiveUIDocument.Document;
 
+                /*using (Transaction transaction = new Transaction(doc))
+                {
+                    Selection sel = uiapp.ActiveUIDocument.Selection;
+
+                    XYZ eye = sel.PickPoint("Por favor, escolha a posição da câmera");
+                    TaskDialog.Show("Ponto selecionado", eye.ToString());
+
+                }*/
+
                 IList<Element> elem = GetAllModelElements(doc);
 
                 List<List<Face>> allFaces = new List<List<Face>>();
@@ -113,12 +122,12 @@ namespace PixeR
                 wf.ShowDialog();
                 Double altura = wf.GetZ() / 30;//nº 30 foi tentativa e erro
 
-                AddView3D(uiapp, doc, altura);
+                List<XYZ> cam = AddView3D(uiapp, doc, altura);
 
                 List<Element> elem_light = GetElementLight(doc);
-                Form2.FormRender fr = new Form2.FormRender(commandData, elem_light, allFaces);
+                Form2.FormRender fr = new Form2.FormRender(commandData, elem_light, allFaces, cam);
                 fr.ShowDialog();
-
+                
                 return Result.Succeeded;
                 
             }
@@ -131,8 +140,9 @@ namespace PixeR
 
         //Fim Main
 
-        private void AddView3D(UIApplication uiapp, Document doc, Double altura)
+        private List<XYZ> AddView3D(UIApplication uiapp, Document doc, Double altura)
         {
+            List<XYZ> cam = new List<XYZ>();
             using (Transaction transaction = new Transaction(doc))
             {
                 if (transaction.Start("Create model curves") == TransactionStatus.Started)
@@ -152,10 +162,14 @@ namespace PixeR
 
                         XYZ eye = sel.PickPoint("Por favor, escolha a posição da câmera");
                         eye = new XYZ(eye.X, eye.Y, altura + eye.Z);
+                        //TaskDialog.Show("eye", eye.ToString());
+                        cam.Add(eye);
 
                         XYZ up = new XYZ(0, 0, 1);
 
                         XYZ lookAt = sel.PickPoint("Por favor, escolha a direção da câmera");
+                        //TaskDialog.Show("lookat", lookAt.ToString());
+                        cam.Add(lookAt);
                         XYZ forward = new XYZ(lookAt.X - eye.X, lookAt.Y - eye.Y, 0);
 
                         view3D.SetOrientation(new ViewOrientation3D(eye, up, forward));
@@ -175,6 +189,7 @@ namespace PixeR
             
 
             }
+            return cam;
         }
 
         private IList<Element> GetAllModelElements(Document doc)
