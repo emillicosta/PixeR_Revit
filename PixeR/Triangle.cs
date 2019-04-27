@@ -21,7 +21,7 @@ namespace Form2
             bbox = new Cube(m_, min_vector(v0, min_vector(v1, v2)), max_vector(v0, max_vector(v1, v2)));
         }
 
-        public override bool Hit( Ray r_, double t_min_, double t_max_, HitRecord  ht_ )
+        public override bool Hit(ref Ray r_, double t_min_, double t_max_, ref HitRecord  ht_ )
         {
             XYZ e1, e2, h, s, q;
             double det, inv_det, u, v;
@@ -68,16 +68,17 @@ namespace Form2
                 if (u < 0.0 || u > 1.0)
                     return false;
                 q = s.CrossProduct(e1);
-                v = inv_det * r_.GetDirection().DotProduct( q);
+                v = inv_det * r_.GetDirection().DotProduct(q);
                 if (v < 0.0 || u + v > 1.0)
                     return false;
                 double t = inv_det * e2.DotProduct(q);
                 if (t > error && t <= t_max_) // ray intersection
                 {
-                    ht_.t = t;
                     ht_.p = r_.PointAt(t);
-                    ht_.normal = e1.CrossProduct( e2).Normalize();
+                    ht_.normal = e1.CrossProduct(e2).Normalize();
                     ht_.mat = material;
+                    //Autodesk.Revit.UI.TaskDialog.Show("Valor de T do triangulo",t.ToString());
+                    ht_.t = t;
                     return true;
                 }
                 else // This means that there is a line intersection but not a ray intersection.

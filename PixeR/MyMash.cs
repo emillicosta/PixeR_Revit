@@ -17,11 +17,10 @@ namespace Form2
             node = node.build(triangles, 0);
         }
 
-        public override bool Hit( Ray r_, double t_min_, double t_max_, HitRecord ht_ )
+        public override bool Hit(ref Ray r_, double t_min_, double t_max_, ref HitRecord ht_ )
         {
-    
-            if(bbox.Hit(r_, t_min_, t_max_, ht_)){
-                return node.Hit(node, r_, t_min_, t_max_, ht_);
+            if(bbox.Hit(ref r_, t_min_, t_max_, ref ht_)){
+                return node.Hit(node, ref r_, t_min_, t_max_, ref ht_);
             }
             return false;
         }

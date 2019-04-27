@@ -57,7 +57,6 @@ namespace Form2
             this.listCam = listCam;
             this.doc = doc;
 
-
             InitializeComponent();
 
         }
@@ -203,7 +202,7 @@ namespace Form2
             this.textBox6.Name = "textBox6";
             this.textBox6.Size = new System.Drawing.Size(44, 20);
             this.textBox6.TabIndex = 8;
-            this.textBox6.Text = "5";
+            this.textBox6.Text = "50";
             this.textBox6.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.TextBox1_KeyPress_double);
             // 
             // textBox5
@@ -221,7 +220,7 @@ namespace Form2
             this.textBox4.Name = "textBox4";
             this.textBox4.Size = new System.Drawing.Size(44, 20);
             this.textBox4.TabIndex = 6;
-            this.textBox4.Text = "20";
+            this.textBox4.Text = "90";
             this.textBox4.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.TextBox1_KeyPress_double);
             // 
             // label8
@@ -656,8 +655,8 @@ namespace Form2
             {
                 topleft = new XYZ(1, 1, 1);
                 topRight = new XYZ(1, 1, 1);
-                bottonLeft = new XYZ(1, 0, 1);
-                bottonRight = new XYZ(1, 0, 1);
+                bottonLeft = new XYZ(0.5, 0.7, 1);
+                bottonRight = new XYZ(0.5, 0.7, 1);
             }
             else
             {
@@ -669,16 +668,18 @@ namespace Form2
             PlanoFundo bg = new PlanoFundo(topleft, topRight, bottonLeft, bottonRight);
 
             List<Objeto> objetos = new List<Objeto>();
+            //String mensagem = "";
             foreach (List<Face> faces in allFaces)
             {
+                //mensagem += "Objeto\n\n";
                 foreach (Face face in faces)
                 {
                     ElementId elementId = face.MaterialElementId;
                     XYZ kd;
-                    if (doc.GetElement(elementId) is Material m)
+                    Material m = doc.GetElement(elementId) as Material;
+                    if (m != null)
                     {
-                        TaskDialog.Show("debug","tem cor");
-                        kd = new XYZ(m.Color.Red, m.Color.Green, m.Color.Blue);
+                        kd = new XYZ(m.Color.Red/255, m.Color.Green/255, m.Color.Blue/255);
                     }
                     else
                     {
@@ -696,7 +697,7 @@ namespace Form2
                     {
                         MeshTriangle triangle = mesh.get_Triangle(k);
 
-                        XYZ v1 = triangle.get_Vertex(0);
+                        XYZ v1 = new XYZ(triangle.get_Vertex(0).X, triangle.get_Vertex(0).Z, triangle.get_Vertex(0).Y*-1);
                         xmin = Math.Min(v1.X, xmin);
                         ymin = Math.Min(v1.Y, ymin);
                         zmin = Math.Min(v1.Z, zmin);
@@ -704,7 +705,7 @@ namespace Form2
                         ymax = Math.Max(v1.Y, ymax);
                         zmax = Math.Max(v1.Z, zmax);
 
-                        XYZ v2 = triangle.get_Vertex(1);
+                        XYZ v2 = new XYZ(triangle.get_Vertex(1).X, triangle.get_Vertex(1).Z, triangle.get_Vertex(1).Y * -1);
                         xmin = Math.Min(v2.X, xmin);
                         ymin = Math.Min(v2.Y, ymin);
                         zmin = Math.Min(v2.Z, zmin);
@@ -712,7 +713,7 @@ namespace Form2
                         ymax = Math.Max(v2.Y, ymax);
                         zmax = Math.Max(v2.Z, zmax);
 
-                        XYZ v3 = triangle.get_Vertex(2);
+                        XYZ v3 = new XYZ(triangle.get_Vertex(2).X, triangle.get_Vertex(2).Z, triangle.get_Vertex(2).Y * -1);
                         xmin = Math.Min(v3.X, xmin);
                         ymin = Math.Min(v3.Y, ymin);
                         zmin = Math.Min(v3.Z, zmin);
@@ -721,8 +722,10 @@ namespace Form2
                         zmax = Math.Max(v3.Z, zmax);
 
                         triangles.Add(new Triangle(mat, v1, v2, v3));
-                        
+                        //mensagem +=  v1.ToString() + v2.ToString() + v3.ToString() + " COR:" + m.Color.Red.ToString() + ";"+ m.Color.Green.ToString()+";"+ m.Color.Blue.ToString()+"\n";
+
                     }
+                    //mensagem += "\n\n";
                     
 
                     XYZ mini = new XYZ(xmin, ymin, zmin);
@@ -731,9 +734,9 @@ namespace Form2
 
                     objetos.Add(new MyMash(mat, triangles, new Cube(mat, mini, maxi)));
                 }
-                //allMaterial.Add(GetMaterialFace(faces, doc));
             }
 
+            //TaskDialog.Show("Malha do objetos", mensagem);
             XYZ luzAmbiente = new XYZ(0.1,0.1,0.1);
 
             List<Luzes> luzes = new List<Luzes>();
@@ -742,12 +745,24 @@ namespace Form2
             luzes.Add(sol);
             //adiciona luzes artificiais
 
+            /*MyMaterial mat1 = new Lambertian(new Constant_texture(new XYZ(0,1,0)));
+            MyMaterial mat2 = new Lambertian(new Constant_texture(new XYZ(0, 1, 1)));
+
+            objetos.Add(new Triangle(mat1, new XYZ(-25.86, 26.25, -1.88), new XYZ(-25.86, 0, -1.88), new XYZ(43.03, 26.25, -1.88) ));
+            objetos.Add(new Triangle(mat2, new XYZ(43.03, 0, -1.88), new XYZ(43.03,26.25 , -1.88), new XYZ(-25.86, 0, -1.88)));
+            List<Triangle> tri = new List<Triangle>();
+            tri.Add(new Triangle(mat1, new XYZ(-25, 0, -0.24), new XYZ(43, -0, -0.9), new XYZ(-25, 0, -0.9)));
+            tri.Add(new Triangle(mat1, new XYZ(43, 0, -0.24), new XYZ(43, 0, -0.9), new XYZ(-25, 0, -0.24)));
+            objetos.Add(new MyMash(mat1, tri, new Cube(mat1, new XYZ(-25, 0, -0.9), new XYZ(43, 0, -0.24))));*/
+
             Scene world = new Scene(objetos, luzes, bg, luzAmbiente);
 
             Shader shader = new LambertianShader(world);
 
             XYZ eye = new XYZ(listCam[0].X, listCam[0].Z, listCam[0].Y*-1);
             XYZ direction = new XYZ(listCam[1].X, listCam[0].Z, listCam[1].Y*-1);
+
+            TaskDialog.Show("pontos camera", "o: "+eye.ToString() + " D: " + direction.ToString());
 
             //GetOrientation()
             PerspectiveCamera cam = new PerspectiveCamera(eye, direction, new XYZ(0,1,0), GetCampoVisao(), largura/altura, GetAbertura(), GetDistFocal());

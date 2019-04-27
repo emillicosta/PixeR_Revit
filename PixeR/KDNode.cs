@@ -82,15 +82,15 @@ namespace Form2
             return i.get_midpoint().Z < j.get_midpoint().Z;
         }
 
-        public bool Hit(KDNode node, Ray r_, double t_min_, double t_max_, HitRecord ht_)
+        public bool Hit(KDNode node, ref Ray r_, double t_min_, double t_max_, ref HitRecord ht_)
         {
-            if (node.bbox.Hit(r_, t_min_, t_max_, ht_))
+            if (node.bbox.Hit(ref r_, t_min_, t_max_, ref ht_))
             {
                 HitRecord left_ht = null, right_ht = null;
                 if (node.left.triangles.Count > 0 || node.right.triangles.Count > 0)
                 {
-                    bool hitleft = Hit(node.left, r_, t_min_, t_max_, left_ht);
-                    bool hitright = Hit(node.right, r_, t_min_, t_max_, right_ht);
+                    bool hitleft = Hit(node.left, ref r_, t_min_, t_max_, ref left_ht);
+                    bool hitright = Hit(node.right,ref r_, t_min_, t_max_, ref right_ht);
                     if (hitleft && hitright)
                     {
                         if (left_ht.t < right_ht.t)
@@ -116,7 +116,7 @@ namespace Form2
                 {
                     for (int i = 0; i < node.triangles.Count; ++i)
                     {
-                        if (node.triangles[i].Hit(r_, t_min_, t_max_, ht_))
+                        if (node.triangles[i].Hit(ref r_, t_min_, t_max_, ref ht_))
                         {
                             return true;
                         }

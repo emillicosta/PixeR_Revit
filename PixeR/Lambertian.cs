@@ -14,7 +14,7 @@ namespace Form2
             alpha = 0;
         }
 
-        public override XYZ emitted(double u, double v, XYZ p)
+        public override XYZ emitted(double u, double v, ref XYZ p)
         {
             return new XYZ();
         }
@@ -30,7 +30,7 @@ namespace Form2
             return p;
         }
 
-        public override bool scatter(Ray r, HitRecord ht_, XYZ attenuation_, Ray scattered_ray, double reflect_prob, Ray scatterd2)
+        public override bool scatter(ref Ray r, ref HitRecord ht_, ref XYZ attenuation_, ref Ray scattered_ray,ref  double reflect_prob, ref Ray scatterd2)
         {
             XYZ p_ = random_in_unit_sphere();
             XYZ target = ht_.p + ht_.normal + p_;

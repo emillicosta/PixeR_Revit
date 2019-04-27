@@ -13,19 +13,31 @@ namespace Form2
             mini = min_;
             maxi = max_;
         }
-        public override bool Hit(Ray r_, double t_min, double t_max, HitRecord ht_)
+        public override bool Hit(ref Ray r_, double t_min, double t_max, ref HitRecord ht_)
         {
             double tymin = (mini.Y - r_.GetOrigin().Y) / r_.GetDirection().Y;
             double tymax = (maxi.Y - r_.GetOrigin().Y) / r_.GetDirection().Y;
-            double tmin = double.NegativeInfinity, tmax = double.PositiveInfinity;
-            for (int i = 0; i < 3; ++i)
-            {
-                double t1 = (mini[i] - r_.GetOrigin()[i]) / r_.GetDirection()[i];
-                double t2 = (maxi[i] - r_.GetOrigin()[i]) / r_.GetDirection()[i];
 
-                tmin = Math.Max(tmin, Math.Min(t1, t2));
-                tmax = Math.Min(tmax, Math.Max(t1, t2));
-            }
+            double tmin = double.NegativeInfinity, tmax = double.PositiveInfinity;
+
+            //testa pro x
+            double t1 = (mini.X - r_.GetOrigin().X) / r_.GetDirection().X;
+            double t2 = (maxi.X - r_.GetOrigin().X) / r_.GetDirection().X;
+            tmin = Math.Max(tmin, Math.Min(t1, t2));
+            tmax = Math.Min(tmax, Math.Max(t1, t2));
+
+            //testa pro y
+            t1 = (mini.Y - r_.GetOrigin().Y) / r_.GetDirection().Y;
+            t2 = (maxi.Y - r_.GetOrigin().Y) / r_.GetDirection().Y;
+            tmin = Math.Max(tmin, Math.Min(t1, t2));
+            tmax = Math.Min(tmax, Math.Max(t1, t2));
+
+            //testa pro Z
+            t1 = (mini.Z - r_.GetOrigin().Z) / r_.GetDirection().Z;
+            t2 = (maxi.Z - r_.GetOrigin().Z) / r_.GetDirection().Z;
+            tmin = Math.Max(tmin, Math.Min(t1, t2));
+            tmax = Math.Min(tmax, Math.Max(t1, t2));
+
             if (tmax > Math.Max(tmin, 0.0))
             {
                 double t = tmin;

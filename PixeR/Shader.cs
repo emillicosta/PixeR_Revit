@@ -7,16 +7,16 @@ namespace Form2
     public abstract class Shader
     {
         protected static Scene world;
-        public abstract XYZ color(Ray r, double t_min, double t_max, int depth_);
+        public abstract XYZ color(ref Ray r, double t_min, double t_max, int depth_);
 
-        public static bool hit_anything( Ray r_, double t_min_, double t_max_, HitRecord ht_)
+        public static bool hit_anything(ref Ray r_, double t_min_, double t_max_, ref HitRecord ht_)
         {
-            HitRecord temp_ht = null;
+            HitRecord temp_ht = new HitRecord();
             bool hit_anything = false;
             double closest_so_far = t_max_;
             for (int i = 0; i < world.list_size; i++)
             {
-                if (world.list[i].Hit(r_, t_min_, closest_so_far, temp_ht))
+                if (world.list[i].Hit(ref r_, t_min_, closest_so_far, ref temp_ht))
                 {
                     hit_anything = true;
                     closest_so_far = temp_ht.t;

@@ -8,6 +8,6 @@ namespace Form2
         public XYZ origin;
         public MyMaterial material;
 
-        public abstract bool Hit(Ray ray, double t_min, double t_max, HitRecord ht);
+        public abstract bool Hit(ref Ray ray, double t_min, double t_max, ref HitRecord ht);
     }
 }

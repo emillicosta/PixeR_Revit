@@ -120,7 +120,7 @@ namespace PixeR
 
                 Form1.FormsImage wf = new Form1.FormsImage();
                 wf.ShowDialog();
-                Double altura = wf.GetZ() / 30;//nº 30 foi tentativa e erro
+                Double altura = wf.GetZ() * 0.0328125;//nº 30 foi tentativa e erro
 
                 List<XYZ> cam = AddView3D(uiapp, doc, altura);
 

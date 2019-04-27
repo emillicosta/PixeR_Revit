@@ -1,4 +1,5 @@
 ﻿using Autodesk.Revit.DB;
+using Autodesk.Revit.UI;
 using System;
 
 namespace Form2
@@ -20,35 +21,30 @@ namespace Form2
             return p;
         }
 
-        public override XYZ color(Ray r_, double t_min, double t_max, int depth_)
+        public override XYZ color(ref Ray r_, double t_min, double t_max, int depth_)
         {
-            HitRecord ht = null;
+            HitRecord ht = new HitRecord();
             // If the ray hitted anything
-            if (Shader.hit_anything(r_, t_min, t_max, ht))
+            if (Shader.hit_anything(ref r_, t_min, t_max, ref ht))
             {
+                //TaskDialog.Show("debug", "bateu");
                 Ray scattered_ray = r_;
                 Ray scattered_ray2 = new Ray(new XYZ(0, 0, 0), new XYZ(0, 0, 0));
                 double reflect_prob = 0.0;
                 XYZ attenuation = new XYZ(1, 1, 1);
-                XYZ emitted = ht.mat.emitted(0, 0, ht.p);
+                XYZ emitted = ht.mat.emitted(0, 0, ref ht.p);
                 if (depth_ > 0)
                 {
-                    if (ht.mat.scatter(r_, ht, attenuation, scattered_ray, reflect_prob, scattered_ray2))
-                        return emitted + Multiplicacao(attenuation, ((reflect_prob * color(scattered_ray, t_min, t_max, depth_ - 1)) + ((1 - reflect_prob) * color(scattered_ray2, t_min, t_max, depth_ - 1))));
+                    if (ht.mat.scatter(ref r_, ref ht, ref attenuation,ref scattered_ray,ref reflect_prob, ref scattered_ray2))
+                        return emitted + Multiplicacao(attenuation, ((reflect_prob * color(ref scattered_ray, t_min, t_max, depth_ - 1)) + ((1 - reflect_prob) * color(ref scattered_ray2, t_min, t_max, depth_ - 1))));
                     else
-                        return emitted + Multiplicacao(attenuation, color(scattered_ray, t_min, t_max, depth_ - 1));
+                        return emitted + Multiplicacao(attenuation, color(ref scattered_ray, t_min, t_max, depth_ - 1));
                 }
 
                 return emitted;
             }
             // Else, dye the pixel with the background color
             return Shader.vertical_interpolation(r_, Shader.world.bg.lower_left, Shader.world.bg.top_left);
-            //XYZ colorido = Shader.vertical_interpolation(r_, Shader.world.bg.lower_left, Shader.world.bg.top_left);
-            XYZ ray = r_.GetDirection().Normalize();
-            double ray_y = ray.Y;
-            double t = (1 + ray_y) * 0.5;   
-            XYZ result = Shader.world.bg.lower_left * (1 - t) + Shader.world.bg.top_left * (t);
-            return result;
 
         }
 
