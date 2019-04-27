@@ -125,7 +125,7 @@ namespace PixeR
                 List<XYZ> cam = AddView3D(uiapp, doc, altura);
 
                 List<Element> elem_light = GetElementLight(doc);
-                Form2.FormRender fr = new Form2.FormRender(commandData, elem_light, allFaces, cam);
+                Form2.FormRender fr = new Form2.FormRender(commandData, elem_light, allFaces, cam, doc);
                 fr.ShowDialog();
                 
                 return Result.Succeeded;

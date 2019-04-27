@@ -41,6 +41,7 @@ namespace Form2
 
         private Regex reg = new Regex(@"^-?\d+[,]?\d*$");
         private ExternalCommandData commandData;
+        private Document doc;
         private List<Element> lights_on;
         private List<List<Face>> allFaces;
         private List<XYZ> listCam;
@@ -48,12 +49,13 @@ namespace Form2
         public Regex Reg { get => reg; set => reg = value; }
         public ExternalCommandData CommandData { get => commandData; set => commandData = value; }
 
-        public FormRender(ExternalCommandData commandData, List<Element> lights, List<List<Face>> allFaces, List<XYZ> listCam)
+        public FormRender(ExternalCommandData commandData, List<Element> lights, List<List<Face>> allFaces, List<XYZ> listCam, Document doc)
         {
             this.CommandData = commandData;
             this.lights_on = lights;
             this.allFaces = allFaces;
             this.listCam = listCam;
+            this.doc = doc;
 
 
             InitializeComponent();
@@ -628,7 +630,6 @@ namespace Form2
         public Bitmap GetImage(XYZ posicaoSol)
         {
             //pegando os dados
-            _ = commandData.Application.ActiveUIDocument.Document;
             int largura = GetLargura();
             int altura = GetAltura();
             int nSamples = 0, ray_depth = 0;
@@ -668,17 +669,70 @@ namespace Form2
             PlanoFundo bg = new PlanoFundo(topleft, topRight, bottonLeft, bottonRight);
 
             List<Objeto> objetos = new List<Objeto>();
-            /*foreach (List<Face> faces in allFaces)
+            foreach (List<Face> faces in allFaces)
             {
                 foreach (Face face in faces)
                 {
-                    Mesh mesh = face.Triangulate();
-                    meshes.Add(mesh);
                     ElementId elementId = face.MaterialElementId;
-                    Material m = doc.GetElement(elementId) as Material;
+                    XYZ kd;
+                    if (doc.GetElement(elementId) is Material m)
+                    {
+                        TaskDialog.Show("debug","tem cor");
+                        kd = new XYZ(m.Color.Red, m.Color.Green, m.Color.Blue);
+                    }
+                    else
+                    {
+                        kd = new XYZ(1, 1, 1);
+                    }
+                    MyMaterial mat = new Lambertian(new Constant_texture(kd));
+
+                    double xmin = double.PositiveInfinity, xmax = double.NegativeInfinity;
+                    double ymin = double.PositiveInfinity, ymax = double.NegativeInfinity;
+                    double zmin = double.PositiveInfinity, zmax = double.NegativeInfinity;
+
+                    List<Triangle> triangles = new List<Triangle>();
+                    Mesh mesh = face.Triangulate();
+                    for (int k = 0; k < mesh.NumTriangles; k++)
+                    {
+                        MeshTriangle triangle = mesh.get_Triangle(k);
+
+                        XYZ v1 = triangle.get_Vertex(0);
+                        xmin = Math.Min(v1.X, xmin);
+                        ymin = Math.Min(v1.Y, ymin);
+                        zmin = Math.Min(v1.Z, zmin);
+                        xmax = Math.Max(v1.X, xmax);
+                        ymax = Math.Max(v1.Y, ymax);
+                        zmax = Math.Max(v1.Z, zmax);
+
+                        XYZ v2 = triangle.get_Vertex(1);
+                        xmin = Math.Min(v2.X, xmin);
+                        ymin = Math.Min(v2.Y, ymin);
+                        zmin = Math.Min(v2.Z, zmin);
+                        xmax = Math.Max(v2.X, xmax);
+                        ymax = Math.Max(v2.Y, ymax);
+                        zmax = Math.Max(v2.Z, zmax);
+
+                        XYZ v3 = triangle.get_Vertex(2);
+                        xmin = Math.Min(v3.X, xmin);
+                        ymin = Math.Min(v3.Y, ymin);
+                        zmin = Math.Min(v3.Z, zmin);
+                        xmax = Math.Max(v3.X, xmax);
+                        ymax = Math.Max(v3.Y, ymax);
+                        zmax = Math.Max(v3.Z, zmax);
+
+                        triangles.Add(new Triangle(mat, v1, v2, v3));
+                        
+                    }
+                    
+
+                    XYZ mini = new XYZ(xmin, ymin, zmin);
+                    XYZ maxi = new XYZ(xmax, ymax, zmax);
+
+
+                    objetos.Add(new MyMash(mat, triangles, new Cube(mat, mini, maxi)));
                 }
                 //allMaterial.Add(GetMaterialFace(faces, doc));
-            }*/
+            }
 
             XYZ luzAmbiente = new XYZ(0.1,0.1,0.1);
 
