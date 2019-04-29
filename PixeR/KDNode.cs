@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Autodesk.Revit.UI;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Form2
@@ -10,20 +11,22 @@ namespace Form2
         KDNode right;
         List<Triangle> triangles;
 
-        public KDNode build(List<Triangle> tris, int depth)
+        public KDNode() { }
+
+        public KDNode build(ref List<Triangle> tris, int depth)
         {
             KDNode node = new KDNode();
             node.triangles = tris;
             node.left = null;
             node.right = null;
-            Cube cube_;
             node.bbox = null;
 
-            if (tris.Count == 0)
+            if (tris.Count == 0) {
                 return node;
+            }
             if (tris.Count == 1)
             {
-                node.bbox = tris[0].bbox;
+                node.bbox =  tris[0].bbox;
                 node.left = new KDNode();
                 node.right = new KDNode();
                 node.left.triangles = new List<Triangle>();
@@ -35,62 +38,53 @@ namespace Form2
             List<Triangle> right_tris = new List<Triangle>();
 
             int axis = depth % 3;
+            IEnumerable<Triangle> query = new List<Triangle>();
             switch (axis)
             {
                 case 0:
-                    ordenarX(tris.First(), tris.Last());
+                    query = tris.OrderBy(triangle => triangle.get_midpoint().X);
                     break;
                 case 1:
-                    ordenarY(tris.First(), tris.Last());
+                    query = tris.OrderBy(triangle => triangle.get_midpoint().Y);
                     break;
                 case 2:
-                    ordenarZ(tris.First(), tris.Last());
+                    query = tris.OrderBy(triangle => triangle.get_midpoint().Z);
                     break;
             }
-            node.bbox = tris[0].bbox;
-            for (int i = 1; i < tris.Count; ++i)
+            node.bbox = query.First().bbox;
+            foreach(Triangle t in query)
             {
-                node.bbox = node.bbox.wrap(node.bbox, tris[i].bbox);
+                node.bbox = node.bbox.wrap(ref node.bbox, ref t.bbox);
             }
 
-            int contAux = tris.Count / 2;
-            for (int i = 0; i < contAux; ++i)
+            int contAux = query.Count() / 2;
+            int aux = 0;
+            foreach (Triangle t in query)
             {
-                left_tris.Add(tris[i]);
-            }
-            for (int i = contAux; i < tris.Count; ++i)
-            {
-                right_tris.Add(tris[i]);
+                if(aux < contAux)
+                    left_tris.Add(t);
+                else
+                    right_tris.Add(t);
+                aux++;
             }
 
-            node.left = build(left_tris, depth + 1);
-            node.right = build(right_tris, depth + 1);
+
+            node.left = build(ref left_tris, depth + 1);
+            node.right = build(ref right_tris, depth + 1);
 
             return node;
         }
 
-        public bool ordenarX(Triangle i, Triangle j)
-        {
-            return i.get_midpoint().X < j.get_midpoint().Y;
-        }
-        bool ordenarY(Triangle i, Triangle j)
-        {
-            return i.get_midpoint().Y < j.get_midpoint().Y;
-        }
-        bool ordenarZ(Triangle i, Triangle j)
-        {
-            return i.get_midpoint().Z < j.get_midpoint().Z;
-        }
-
-        public bool Hit(KDNode node, ref Ray r_, double t_min_, double t_max_, ref HitRecord ht_)
+        public bool Hit(ref KDNode node, ref Ray r_, double t_min_, double t_max_, ref HitRecord ht_)
         {
             if (node.bbox.Hit(ref r_, t_min_, t_max_, ref ht_))
             {
-                HitRecord left_ht = null, right_ht = null;
+                HitRecord left_ht = new HitRecord(), right_ht = new HitRecord();
+                //TaskDialog.Show("qtd de left right", node.left.triangles.Count + "; " +node.right.triangles.Count);
                 if (node.left.triangles.Count > 0 || node.right.triangles.Count > 0)
                 {
-                    bool hitleft = Hit(node.left, ref r_, t_min_, t_max_, ref left_ht);
-                    bool hitright = Hit(node.right,ref r_, t_min_, t_max_, ref right_ht);
+                    bool hitleft = Hit(ref node.left, ref r_, t_min_, t_max_, ref left_ht);
+                    bool hitright = Hit(ref node.right,ref r_, t_min_, t_max_, ref right_ht);
                     if (hitleft && hitright)
                     {
                         if (left_ht.t < right_ht.t)

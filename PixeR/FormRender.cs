@@ -169,7 +169,7 @@ namespace Form2
             this.textBox3.Name = "textBox3";
             this.textBox3.Size = new System.Drawing.Size(44, 20);
             this.textBox3.TabIndex = 3;
-            this.textBox3.Text = "600";
+            this.textBox3.Text = "200";
             this.textBox3.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.TextBox1_KeyPress);
             // 
             // textBox2
@@ -178,7 +178,7 @@ namespace Form2
             this.textBox2.Name = "textBox2";
             this.textBox2.Size = new System.Drawing.Size(44, 20);
             this.textBox2.TabIndex = 2;
-            this.textBox2.Text = "300";
+            this.textBox2.Text = "200";
             this.textBox2.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.TextBox1_KeyPress);
             // 
             // groupBox2
@@ -220,7 +220,7 @@ namespace Form2
             this.textBox4.Name = "textBox4";
             this.textBox4.Size = new System.Drawing.Size(44, 20);
             this.textBox4.TabIndex = 6;
-            this.textBox4.Text = "90";
+            this.textBox4.Text = "45";
             this.textBox4.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.TextBox1_KeyPress_double);
             // 
             // label8
@@ -655,15 +655,15 @@ namespace Form2
             {
                 topleft = new XYZ(1, 1, 1);
                 topRight = new XYZ(1, 1, 1);
-                bottonLeft = new XYZ(0.5, 0.7, 1);
-                bottonRight = new XYZ(0.5, 0.7, 1);
+                bottonLeft = new XYZ(0, 0.2, 0.5);
+                bottonRight = new XYZ(0, 0.2, 0.5);
             }
             else
             {
-                topleft = new XYZ(0, 0, 0);
-                topRight = new XYZ(0, 0, 0);
-                bottonLeft = new XYZ(0, 0, 0);
-                bottonRight = new XYZ(0, 0, 0);
+                topleft = new XYZ(1, 1, 1);
+                topRight = new XYZ(1, 1, 1);
+                bottonLeft = new XYZ(1, 1, 1);
+                bottonRight = new XYZ(1, 1, 1);
             }
             PlanoFundo bg = new PlanoFundo(topleft, topRight, bottonLeft, bottonRight);
 
@@ -672,32 +672,32 @@ namespace Form2
             foreach (List<Face> faces in allFaces)
             {
                 //mensagem += "Objeto\n\n";
+                List<Triangle> triangles = new List<Triangle>();
+                double xmin = double.PositiveInfinity, xmax = double.NegativeInfinity;
+                double ymin = double.PositiveInfinity, ymax = double.NegativeInfinity;
+                double zmin = double.PositiveInfinity, zmax = double.NegativeInfinity;
+
+                MyMaterial mat = new Lambertian(new Constant_texture(new XYZ()));
                 foreach (Face face in faces)
                 {
                     ElementId elementId = face.MaterialElementId;
-                    XYZ kd;
+                    XYZ kd = new XYZ();
                     Material m = doc.GetElement(elementId) as Material;
                     if (m != null)
                     {
-                        kd = new XYZ(m.Color.Red/255, m.Color.Green/255, m.Color.Blue/255);
+                        double red = Convert.ToDouble(m.Color.Red) / 255;
+                        double green = Convert.ToDouble(m.Color.Green) / 255;
+                        double blue = Convert.ToDouble(m.Color.Blue) / 255;
+                        kd = new XYZ(red, green, blue);
                     }
-                    else
-                    {
-                        kd = new XYZ(1, 1, 1);
-                    }
-                    MyMaterial mat = new Lambertian(new Constant_texture(kd));
-
-                    double xmin = double.PositiveInfinity, xmax = double.NegativeInfinity;
-                    double ymin = double.PositiveInfinity, ymax = double.NegativeInfinity;
-                    double zmin = double.PositiveInfinity, zmax = double.NegativeInfinity;
-
-                    List<Triangle> triangles = new List<Triangle>();
+                    mat = new Lambertian(new Constant_texture(kd));
+                    
                     Mesh mesh = face.Triangulate();
                     for (int k = 0; k < mesh.NumTriangles; k++)
                     {
                         MeshTriangle triangle = mesh.get_Triangle(k);
 
-                        XYZ v1 = new XYZ(triangle.get_Vertex(0).X, triangle.get_Vertex(0).Z, triangle.get_Vertex(0).Y*-1);
+                        XYZ v1 = new XYZ(triangle.get_Vertex(0).X*-1, triangle.get_Vertex(0).Z, triangle.get_Vertex(0).Y*-1);
                         xmin = Math.Min(v1.X, xmin);
                         ymin = Math.Min(v1.Y, ymin);
                         zmin = Math.Min(v1.Z, zmin);
@@ -705,7 +705,7 @@ namespace Form2
                         ymax = Math.Max(v1.Y, ymax);
                         zmax = Math.Max(v1.Z, zmax);
 
-                        XYZ v2 = new XYZ(triangle.get_Vertex(1).X, triangle.get_Vertex(1).Z, triangle.get_Vertex(1).Y * -1);
+                        XYZ v2 = new XYZ(triangle.get_Vertex(1).X*-1, triangle.get_Vertex(1).Z, triangle.get_Vertex(1).Y * -1);
                         xmin = Math.Min(v2.X, xmin);
                         ymin = Math.Min(v2.Y, ymin);
                         zmin = Math.Min(v2.Z, zmin);
@@ -713,7 +713,7 @@ namespace Form2
                         ymax = Math.Max(v2.Y, ymax);
                         zmax = Math.Max(v2.Z, zmax);
 
-                        XYZ v3 = new XYZ(triangle.get_Vertex(2).X, triangle.get_Vertex(2).Z, triangle.get_Vertex(2).Y * -1);
+                        XYZ v3 = new XYZ(triangle.get_Vertex(2).X*-1, triangle.get_Vertex(2).Z, triangle.get_Vertex(2).Y * -1);
                         xmin = Math.Min(v3.X, xmin);
                         ymin = Math.Min(v3.Y, ymin);
                         zmin = Math.Min(v3.Z, zmin);
@@ -727,13 +727,12 @@ namespace Form2
                     }
                     //mensagem += "\n\n";
                     
-
-                    XYZ mini = new XYZ(xmin, ymin, zmin);
-                    XYZ maxi = new XYZ(xmax, ymax, zmax);
-
-
-                    objetos.Add(new MyMash(mat, triangles, new Cube(mat, mini, maxi)));
                 }
+                
+                XYZ mini = new XYZ(xmin, ymin, zmin);
+                XYZ maxi = new XYZ(xmax, ymax, zmax);
+                
+                objetos.Add(new MyMash(mat, triangles, new Cube(mat, mini, maxi)));
             }
 
             //TaskDialog.Show("Malha do objetos", mensagem);
@@ -741,31 +740,21 @@ namespace Form2
 
             List<Luzes> luzes = new List<Luzes>();
             //adiciona o sol
-            PointLight sol = new PointLight(posicaoSol, new XYZ(1,1,1));
+            PointLight sol = new PointLight(posicaoSol, new XYZ(1,1,0));
             luzes.Add(sol);
             //adiciona luzes artificiais
-
-            /*MyMaterial mat1 = new Lambertian(new Constant_texture(new XYZ(0,1,0)));
-            MyMaterial mat2 = new Lambertian(new Constant_texture(new XYZ(0, 1, 1)));
-
-            objetos.Add(new Triangle(mat1, new XYZ(-25.86, 26.25, -1.88), new XYZ(-25.86, 0, -1.88), new XYZ(43.03, 26.25, -1.88) ));
-            objetos.Add(new Triangle(mat2, new XYZ(43.03, 0, -1.88), new XYZ(43.03,26.25 , -1.88), new XYZ(-25.86, 0, -1.88)));
-            List<Triangle> tri = new List<Triangle>();
-            tri.Add(new Triangle(mat1, new XYZ(-25, 0, -0.24), new XYZ(43, -0, -0.9), new XYZ(-25, 0, -0.9)));
-            tri.Add(new Triangle(mat1, new XYZ(43, 0, -0.24), new XYZ(43, 0, -0.9), new XYZ(-25, 0, -0.24)));
-            objetos.Add(new MyMash(mat1, tri, new Cube(mat1, new XYZ(-25, 0, -0.9), new XYZ(43, 0, -0.24))));*/
 
             Scene world = new Scene(objetos, luzes, bg, luzAmbiente);
 
             Shader shader = new LambertianShader(world);
 
-            XYZ eye = new XYZ(listCam[0].X, listCam[0].Z, listCam[0].Y*-1);
-            XYZ direction = new XYZ(listCam[1].X, listCam[0].Z, listCam[1].Y*-1);
+            XYZ eye = new XYZ(listCam[0].X*-1, listCam[0].Z, listCam[0].Y*-1);
+            XYZ direction = new XYZ(listCam[1].X*-1, listCam[0].Z, listCam[1].Y*-1);
 
             TaskDialog.Show("pontos camera", "o: "+eye.ToString() + " D: " + direction.ToString());
 
             //GetOrientation()
-            PerspectiveCamera cam = new PerspectiveCamera(eye, direction, new XYZ(0,1,0), GetCampoVisao(), largura/altura, GetAbertura(), GetDistFocal());
+            PerspectiveCamera cam = new PerspectiveCamera(eye, direction, new XYZ(0,-1,0), GetCampoVisao(), largura/altura, GetAbertura(), GetDistFocal());
 
             Raytrace raytrace = new Raytrace();
             Bitmap img = raytrace.Render(cam, world, shader, largura, altura, nSamples, ray_depth, t_min, t_max);

@@ -179,7 +179,7 @@ namespace PixeR
                         Parameter farClip = view3D.LookupParameter("Recorte afastado ativo");
                         farClip.Set(0);
 
-                        //view3D.DisplayStyle = DisplayStyle.Realistic;
+                        view3D.DisplayStyle = DisplayStyle.Realistic;
                     }
 
                     transaction.Commit();

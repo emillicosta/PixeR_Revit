@@ -18,7 +18,7 @@ namespace Form2
             v1 = v1_;
             v2 = v2_;
             backface_cull = backface_cull_;
-            bbox = new Cube(m_, min_vector(v0, min_vector(v1, v2)), max_vector(v0, max_vector(v1, v2)));
+            bbox = new Cube(material, min_vector(v0, min_vector(v1, v2)), max_vector(v0, max_vector(v1, v2)));
         }
 
         public override bool Hit(ref Ray r_, double t_min_, double t_max_, ref HitRecord  ht_ )
@@ -92,61 +92,46 @@ namespace Form2
 
         public XYZ min_vector(XYZ v, XYZ u)
         {
-            XYZ aux = new XYZ(0, 0, 0);
+            double x, y, z;
             if (v.X < u.X)
-            {
-                aux = new XYZ(v.X, aux.Y, aux.Z);
-            }
+                x = v.X;
             else
-            {
-                aux = new XYZ(u.X, aux.Y, aux.Z);
-            }
+                x = u.X;
+
             if (v.Y < u.Y)
-            {
-                aux = new XYZ(aux.X, v.Y, aux.Z);
-            }
+                y = v.Y;
             else
-            {
-                aux = new XYZ(aux.X, u.Y, aux.Z);
-            }
+                y = u.Y;
+
             if (v.Z < u.Z)
-            {
-                aux = new XYZ(aux.X, aux.Y, v.Z);
-            }
+                z = v.Z;
             else
-            {
-                aux = new XYZ(aux.X, aux.Y, u.Z);
-            }
+                z = u.Z;
+
+            XYZ aux = new XYZ(x, y, z);
             return aux;
         }
 
         public XYZ max_vector(XYZ v, XYZ u)
         {
-            XYZ aux = new XYZ(0, 0, 0);
+            double x, y, z;
             if (v.X > u.X)
-            {
-                aux = new XYZ(v.X, aux.Y, aux.Z);
-            }
+                x = v.X;
             else
-            {
-                aux = new XYZ(u.X, aux.Y, aux.Z);
-            }
+                x = u.X;
+
             if (v.Y > u.Y)
-            {
-                aux = new XYZ(aux.X, v.Y, aux.Z);
-            }
+                y = v.Y;
             else
-            {
-                aux = new XYZ(aux.X, u.Y, aux.Z);
-            }
+                y = u.Y;
+
             if (v.Z > u.Z)
-            {
-                aux = new XYZ(aux.X, aux.Y, v.Z);
-            }
+                z = v.Z;
             else
-            {
-                aux = new XYZ(aux.X, aux.Y, u.Z);
-            }
+                z = u.Z;
+
+            XYZ aux = new XYZ(x, y, z);
+
             return aux;
         }
 

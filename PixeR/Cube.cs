@@ -10,14 +10,19 @@ namespace Form2
         {
             origin = new XYZ(0, 0, 0);
             material = m_;
+            double x = max_.X, y = max_.Y, z=max_.Z;
+            if (min_.X == max_.X)
+                x += 0.5;
+            if (min_.Y == max_.Y)
+                y += 0.5;
+            if (min_.Z == max_.Z)
+                z += 0.5;
             mini = min_;
-            maxi = max_;
+            maxi = new XYZ(x,y,z);
         }
+        public Cube() { }
         public override bool Hit(ref Ray r_, double t_min, double t_max, ref HitRecord ht_)
         {
-            double tymin = (mini.Y - r_.GetOrigin().Y) / r_.GetDirection().Y;
-            double tymax = (maxi.Y - r_.GetOrigin().Y) / r_.GetDirection().Y;
-
             double tmin = double.NegativeInfinity, tmax = double.PositiveInfinity;
 
             //testa pro x
@@ -45,7 +50,7 @@ namespace Form2
                 ht_.p = r_.PointAt(t);
                 XYZ c = (mini + maxi) * 0.5;
                 XYZ p = ht_.p - c;
-                XYZ d = (mini - maxi) * 0.5;
+                XYZ d = (maxi - mini) * 0.5;
                 double bias = 1.000001;
                 XYZ normal = new XYZ(
                         p.X / Math.Abs(d.X) * bias,
@@ -60,7 +65,7 @@ namespace Form2
             return false;
         }
 
-        public Cube wrap(Cube node, Cube bbox_tri)
+        public Cube wrap(ref Cube node, ref Cube bbox_tri)
         {
             XYZ mini_ = min_vector(node.mini, bbox_tri.mini);
             XYZ maxi_1 = max_vector(node.maxi, bbox_tri.maxi);

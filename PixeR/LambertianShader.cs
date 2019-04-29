@@ -27,7 +27,6 @@ namespace Form2
             // If the ray hitted anything
             if (Shader.hit_anything(ref r_, t_min, t_max, ref ht))
             {
-                //TaskDialog.Show("debug", "bateu");
                 Ray scattered_ray = r_;
                 Ray scattered_ray2 = new Ray(new XYZ(0, 0, 0), new XYZ(0, 0, 0));
                 double reflect_prob = 0.0;
