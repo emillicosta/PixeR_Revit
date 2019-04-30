@@ -12,11 +12,11 @@ namespace Form2
             material = m_;
             double x = max_.X, y = max_.Y, z=max_.Z;
             if (min_.X == max_.X)
-                x += 0.5;
+                x += 0.1;
             if (min_.Y == max_.Y)
-                y += 0.5;
+                y += 0.1;
             if (min_.Z == max_.Z)
-                z += 0.5;
+                z += 0.1;
             mini = min_;
             maxi = new XYZ(x,y,z);
         }
@@ -45,6 +45,7 @@ namespace Form2
 
             if (tmax > Math.Max(tmin, 0.0))
             {
+                return true;
                 double t = tmin;
                 ht_.t = tmin;
                 ht_.p = r_.PointAt(t);
@@ -59,7 +60,7 @@ namespace Form2
                        );
                 ht_.normal = normal.Normalize();
                 ht_.mat = material;
-                return true;
+                
             }
 
             return false;

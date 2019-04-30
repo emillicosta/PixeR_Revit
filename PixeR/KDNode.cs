@@ -79,6 +79,7 @@ namespace Form2
         {
             if (node.bbox.Hit(ref r_, t_min_, t_max_, ref ht_))
             {
+                ht_ = new HitRecord();
                 HitRecord left_ht = new HitRecord(), right_ht = new HitRecord();
                 //TaskDialog.Show("qtd de left right", node.left.triangles.Count + "; " +node.right.triangles.Count);
                 if (node.left.triangles.Count > 0 || node.right.triangles.Count > 0)

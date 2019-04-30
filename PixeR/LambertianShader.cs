@@ -29,35 +29,35 @@ namespace Form2
             // If the ray hitted anything
             if (Shader.hit_anything( r_, t_min, t_max, ref ht))
             {
-                Ray scattered_ray = r_;
-                Ray scattered_ray2 = new Ray(new XYZ(0, 0, 0), new XYZ(0, 0, 0));
-                double reflect_prob = 0.0;
-                XYZ attenuation = new XYZ(1, 1, 1);
-                XYZ emitted = ht.mat.emitted(0, 0, ref ht.p);
-
-                XYZ p = r_.GetOrigin() + ht.t * r_.GetDirection();
-
-                XYZ ambient = Multiplicacao(ht.mat.ka, world.ambientLight);
-
-                for (int i = 0; i < world.lum_size; i++)
+                if (ht.mat != null)
                 {
-                    Ray r_light = new Ray(p, world.lum[i].GetDirection(p));
-                    if (!Shader.hit_anything(r_light, t_min, t_max, ref ht_s))
+                    Ray scattered_ray = r_;
+                    Ray scattered_ray2 = new Ray(new XYZ(0, 0, 0), new XYZ(0, 0, 0));
+                    double reflect_prob = 0.0;
+                    XYZ attenuation = new XYZ(1, 1, 1);
+                    XYZ emitted = ht.mat.emitted(0, 0, ref ht.p);
+
+                    XYZ p = r_.GetOrigin() + ht.t * r_.GetDirection();
+
+                    XYZ ambient = Multiplicacao(ht.mat.ka, world.ambientLight);
+
+                    for (int i = 0; i < world.lum_size; i++)
                     {
-                        if (depth_ > 0)
+                        Ray r_light = new Ray(p, world.lum[i].GetDirection(p));
+                        if (!Shader.hit_anything(r_light, t_min, t_max, ref ht_s))
                         {
-                            if (ht.mat.scatter(ref r_, ref ht, ref attenuation, ref scattered_ray, ref reflect_prob, ref scattered_ray2))
-                                return emitted + Multiplicacao(attenuation, ((reflect_prob * color(ref scattered_ray, t_min, t_max, depth_ - 1)) + ((1 - reflect_prob) * color(ref scattered_ray2, t_min, t_max, depth_ - 1))));
-                            else
-                                return emitted + Multiplicacao(attenuation, color(ref scattered_ray, t_min, t_max, depth_ - 1));
+                            if (depth_ > 0)
+                            {
+                                if (ht.mat.scatter(ref r_, ref ht, ref attenuation, ref scattered_ray, ref reflect_prob, ref scattered_ray2))
+                                    return emitted + Multiplicacao(attenuation, ((reflect_prob * color(ref scattered_ray, t_min, t_max, depth_ - 1)) + ((1 - reflect_prob) * color(ref scattered_ray2, t_min, t_max, depth_ - 1))));
+                                else
+                                    return emitted + Multiplicacao(attenuation, color(ref scattered_ray, t_min, t_max, depth_ - 1));
+                            }
+                            return emitted;
                         }
-                        return emitted;
                     }
+                    return ambient;
                 }
-                return ambient;
-
-
-
             }
             // Else, dye the pixel with the background color
             return Shader.vertical_interpolation(r_, Shader.world.bg.lower_left, Shader.world.bg.top_left);

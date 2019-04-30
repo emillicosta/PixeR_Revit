@@ -46,6 +46,7 @@ namespace Form2
         private List<List<Mesh>> allMesh;
         private List<List<Material>> materials;
         private List<XYZ> listCam;
+        private List<Objeto> objetos = new List<Objeto>();
 
         public Regex Reg { get => reg; set => reg = value; }
         public ExternalCommandData CommandData { get => commandData; set => commandData = value; }
@@ -58,6 +59,8 @@ namespace Form2
             this.materials = materials;
             this.listCam = listCam;
             this.doc = doc;
+
+            GetObjects();
 
             InitializeComponent();
 
@@ -628,50 +631,10 @@ namespace Form2
             return comboBox4.Text;
         }
 
-        public Bitmap GetImage(XYZ posicaoSol)
+        public void GetObjects()
         {
-            //pegando os dados
-            int largura = GetLargura();
-            int altura = GetAltura();
-            int nSamples = 0, ray_depth = 0;
-            if (GetQualidade() == "Baixa")
-            {
-                nSamples = 10; ray_depth = 10;
-            }
-            else if (GetQualidade() == "Média")
-            {
-                nSamples = 50; ray_depth = 50;
-
-            }
-            else if (GetQualidade() == "Alta")
-            {
-                nSamples = 100; ray_depth = 100;
-            }
-            double t_min = 0.00001, t_max = double.PositiveInfinity;
-
-            XYZ topleft;
-            XYZ topRight;
-            XYZ bottonLeft;
-            XYZ bottonRight;
-            if (GetBackGround() == "Céu")
-            {
-                topleft = new XYZ(1, 1, 1);
-                topRight = new XYZ(1, 1, 1);
-                bottonLeft = new XYZ(0, 0.2, 0.5);
-                bottonRight = new XYZ(0, 0.2, 0.5);
-            }
-            else
-            {
-                topleft = new XYZ(1, 1, 1);
-                topRight = new XYZ(1, 1, 1);
-                bottonLeft = new XYZ(1, 1, 1);
-                bottonRight = new XYZ(1, 1, 1);
-            }
-            PlanoFundo bg = new PlanoFundo(topleft, topRight, bottonLeft, bottonRight);
-
-            List<Objeto> objetos = new List<Objeto>();
             //String mensagem = "";
-            for(int i  = 0; i < allMesh.Count;i ++)
+            for (int i = 0; i < allMesh.Count; i++)
             {
                 //mensagem += "Objeto\n\n";
                 List<Triangle> triangles = new List<Triangle>();
@@ -679,7 +642,6 @@ namespace Form2
                 double ymin = double.PositiveInfinity, ymax = double.NegativeInfinity;
                 double zmin = double.PositiveInfinity, zmax = double.NegativeInfinity;
 
-                MyMaterial mat = new Lambertian(new Constant_texture(new XYZ()));
                 for (int j = 0; j < allMesh[i].Count; j++)
                 {
                     for (int k = 0; k < allMesh[i][j].NumTriangles; k++)
@@ -689,7 +651,7 @@ namespace Form2
                         double green = Convert.ToDouble(materials[i][j].Color.Green) / 255;
                         double blue = Convert.ToDouble(materials[i][j].Color.Blue) / 255;
                         XYZ kd = new XYZ(red, green, blue);
-                        mat = new Lambertian(new Constant_texture(kd));
+                        MyMaterial mat = new Lambertian(new Constant_texture(kd));
                         //Get points 
                         MeshTriangle triangle = allMesh[i][j].get_Triangle(k);
 
@@ -730,6 +692,48 @@ namespace Form2
 
                 objetos.Add(new MyMash(null, triangles, new Cube(null, mini, maxi)));
             }
+        }
+        public Bitmap GetImage(XYZ posicaoSol)
+        {
+            //pegando os dados
+            int largura = GetLargura();
+            int altura = GetAltura();
+            int nSamples = 0, ray_depth = 0;
+            if (GetQualidade() == "Baixa")
+            {
+                nSamples = 10; ray_depth = 5;
+            }
+            else if (GetQualidade() == "Média")
+            {
+                nSamples = 50; ray_depth = 50;
+
+            }
+            else if (GetQualidade() == "Alta")
+            {
+                nSamples = 100; ray_depth = 100;
+            }
+            double t_min = 0.00001, t_max = double.PositiveInfinity;
+
+            XYZ topleft;
+            XYZ topRight;
+            XYZ bottonLeft;
+            XYZ bottonRight;
+            if (GetBackGround() == "Céu")
+            {
+                topleft = new XYZ(1, 1, 1);
+                topRight = new XYZ(1, 1, 1);
+                bottonLeft = new XYZ(0, 0.2, 0.5);
+                bottonRight = new XYZ(0, 0.2, 0.5);
+            }
+            else
+            {
+                topleft = new XYZ(1, 1, 1);
+                topRight = new XYZ(1, 1, 1);
+                bottonLeft = new XYZ(1, 1, 1);
+                bottonRight = new XYZ(1, 1, 1);
+            }
+            PlanoFundo bg = new PlanoFundo(topleft, topRight, bottonLeft, bottonRight);
+
 
             //TaskDialog.Show("Malha do objetos", mensagem);
             XYZ luzAmbiente = new XYZ(0.1, 0.1, 0.1);
@@ -747,7 +751,7 @@ namespace Form2
             XYZ eye = new XYZ(listCam[0].X * -1, listCam[0].Z, listCam[0].Y * -1);
             XYZ direction = new XYZ(listCam[1].X * -1, listCam[0].Z, listCam[1].Y * -1);
 
-            TaskDialog.Show("pontos camera", "o: " + eye.ToString() + " D: " + direction.ToString());
+            //TaskDialog.Show("pontos camera", "o: " + eye.ToString() + " D: " + direction.ToString());
 
             //GetOrientation()
             PerspectiveCamera cam = new PerspectiveCamera(eye, direction, new XYZ(0, -1, 0), GetCampoVisao(), largura / altura, GetAbertura(), GetDistFocal());

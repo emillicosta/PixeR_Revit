@@ -19,10 +19,7 @@ namespace Form2
 
         public override bool Hit(ref Ray r_, double t_min_, double t_max_, ref HitRecord ht_ )
         {
-            if(bbox.Hit(ref r_, t_min_, t_max_, ref ht_)){
-                return node.Hit(ref node, ref r_, t_min_, t_max_, ref ht_);
-            }
-            return false;
+            return node.Hit(ref node, ref r_, t_min_, t_max_, ref ht_);
         }
     }
 }
