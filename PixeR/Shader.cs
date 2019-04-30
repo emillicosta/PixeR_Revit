@@ -9,7 +9,7 @@ namespace Form2
         protected static Scene world;
         public abstract XYZ color(ref Ray r, double t_min, double t_max, int depth_);
 
-        public static bool hit_anything(ref Ray r_, double t_min_, double t_max_, ref HitRecord ht_)
+        public static bool hit_anything(Ray r_, double t_min_, double t_max_, ref HitRecord ht_)
         {
             HitRecord temp_ht = new HitRecord();
             bool hit_anything = false;

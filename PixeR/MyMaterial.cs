@@ -7,7 +7,7 @@ namespace Form2
     {
         public Texture albedo;
         public XYZ ks;
-        public XYZ ka;
+        public XYZ ka = new XYZ(0.1,0.1,0.1);
         public XYZ km;
         public List<XYZ> gradient;
         public double alpha;

@@ -69,18 +69,18 @@ namespace PixeR
 
                 }*/
 
-                List<Element> elem = GetAllModelElements(doc);
+                List<Element> elementsDoc = GetAllModelElements(doc);
 
                 List<List<Face>> allFaces = new List<List<Face>>();
-                foreach (Element e in elem)
+                foreach (Element e in elementsDoc)
                 {
                     allFaces.Add(GetFaces(e));
                 }
 
                 List<List<Mesh>> allMesh = new List<List<Mesh>>();
-                foreach (List<Face> f in allFaces)
+                foreach (Element e in elementsDoc)
                 {
-                    allMesh.Add(GetMesh(f));
+                    allMesh.Add(GetMesh(e));
                 }
 
                 List<List<Material>> allMaterial = new List<List<Material>>();
@@ -88,10 +88,24 @@ namespace PixeR
                 {
                     allMaterial.Add(GetMaterialFace(f, doc));
                 }
+                if(allMesh.Count == allMaterial.Count)
+                {
+                    for(int i = 0; i < allMesh.Count; i++)
+                    {
+                        if(allMesh[i].Count != allMaterial[i].Count)
+                        {
+                            TaskDialog.Show("Debug", "a quantidade de malhas não é igual a de materiais.");
+                        }
+                    }
+                }
+                else
+                {
+                    TaskDialog.Show("Debug", "a quantidade dos ELEMENTOS malhas não é igual a de materiais.");
+                }
 
                 List<LightType> lights = GetLightsData(doc);
 
-                List<Objeto> objects = GetObjects( elem,  doc);
+                //List<Objeto> objects = GetObjects(elem,  doc);
 
 
                 Form1.FormsImage wf = new Form1.FormsImage();
@@ -101,7 +115,7 @@ namespace PixeR
                 List<XYZ> cam = AddView3D(uiapp, doc, altura);
 
                 List<Element> elem_light = GetElementLight(doc);
-                Form2.FormRender fr = new Form2.FormRender(commandData, elem_light, objects, cam, doc);
+                Form2.FormRender fr = new Form2.FormRender(commandData, elem_light, allMesh, allMaterial, cam, doc);
                 fr.ShowDialog();
                 
                 return Result.Succeeded;
@@ -184,15 +198,47 @@ namespace PixeR
             return elements;
         }
 
-        private List<Mesh> GetMesh(List<Face> faces)
+        private List<Mesh> GetMesh(Element element)
         {
             List<Mesh> meshes = new List<Mesh>();
-            foreach (Face geomFace in faces)
+
+            Options opt = new Options();
+            GeometryElement geomElem = element.get_Geometry(opt);
+            foreach (GeometryObject geomObj in geomElem)
             {
-                Mesh mesh = geomFace.Triangulate();
-                meshes.Add(mesh);
-            }
-            
+                Solid geomSolid = geomObj as Solid;
+                if (null != geomSolid)
+                {
+                    foreach (Face geomFace in geomSolid.Faces)
+                    {
+                        Mesh mesh = geomFace.Triangulate();
+                        meshes.Add(mesh);
+                    }
+                }
+                else
+                {
+                    GeometryInstance geoInstance = geomObj as GeometryInstance;
+                    if (null != geoInstance)
+                    {
+                        GeometryElement symbolGeo = geoInstance.SymbolGeometry;
+
+                        foreach (GeometryObject o2 in symbolGeo)
+                        {
+                            Solid s = o2 as Solid;
+                            if (null != s)
+                            {
+                                Transform instTransform = geoInstance.Transform;
+                                foreach (Face geomFace in s.Faces)
+                                {
+                                    Mesh mesh = geomFace.Triangulate();
+                                    mesh = mesh.get_Transformed(instTransform);
+                                    meshes.Add(mesh);
+                                }
+                            }
+                        }
+                    }
+                }
+            }            
             return meshes;
         }
 
@@ -223,6 +269,7 @@ namespace PixeR
                             Solid s = o2 as Solid;
                             if (null != s)
                             {
+                                
                                 foreach (Face geomFace in s.Faces)
                                 {
                                     faces.Add(geomFace);
@@ -417,11 +464,13 @@ namespace PixeR
 
                                 //get point of object
                                 Mesh mesh = face.Triangulate();
+                                if(instTransform != null)
+                                    mesh = mesh.get_Transformed(instTransform);
                                 for (int k = 0; k < mesh.NumTriangles; k++)
                                 {
                                     MeshTriangle triangle = mesh.get_Triangle(k);
 
-                                    XYZ transV1 = instTransform.OfPoint(triangle.get_Vertex(0));
+                                    XYZ transV1 = triangle.get_Vertex(0);
                                     XYZ v1 = new XYZ(transV1.X * -1, transV1.Z, transV1.Y * -1);
                                     xmin = Math.Min(v1.X, xmin);
                                     ymin = Math.Min(v1.Y, ymin);
@@ -430,7 +479,7 @@ namespace PixeR
                                     ymax = Math.Max(v1.Y, ymax);
                                     zmax = Math.Max(v1.Z, zmax);
 
-                                    XYZ transV2 = instTransform.OfPoint(triangle.get_Vertex(1));
+                                    XYZ transV2 = triangle.get_Vertex(1);
                                     XYZ v2 = new XYZ(transV2.X * -1, transV2.Z, transV2.Y * -1);
                                     xmin = Math.Min(v2.X, xmin);
                                     ymin = Math.Min(v2.Y, ymin);
@@ -439,7 +488,7 @@ namespace PixeR
                                     ymax = Math.Max(v2.Y, ymax);
                                     zmax = Math.Max(v2.Z, zmax);
 
-                                    XYZ transV3 = instTransform.OfPoint(triangle.get_Vertex(2));
+                                    XYZ transV3 = triangle.get_Vertex(2);
                                     XYZ v3 = new XYZ(transV3.X * -1, transV3.Z, transV3.Y * -1);
                                     xmin = Math.Min(v3.X, xmin);
                                     ymin = Math.Min(v3.Y, ymin);
@@ -467,6 +516,7 @@ namespace PixeR
 
             return objetos;
         }
+
 
 
 
