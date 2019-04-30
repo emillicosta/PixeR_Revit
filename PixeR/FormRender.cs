@@ -46,6 +46,7 @@ namespace Form2
         private readonly List<List<Material>> materials;
         private readonly List<XYZ> listCam;
         private List<MyObject> objects = new List<MyObject>();
+        private int width, height, nSamples = 0, ray_depth = 0;
 
         public Regex Reg { get => reg; set => reg = value; }
         public ExternalCommandData CommandData { get => commandData; set => commandData = value; }
@@ -643,17 +644,17 @@ namespace Form2
 
                 for (int j = 0; j < allMesh[i].Count; j++)
                 {
+                    //Get Material
+                    double red = Convert.ToDouble(materials[i][j].Color.Red) / 255;
+                    double green = Convert.ToDouble(materials[i][j].Color.Green) / 255;
+                    double blue = Convert.ToDouble(materials[i][j].Color.Blue) / 255;
+
+                    XYZ kd = new XYZ(red, green, blue);
+
+                    MyMaterial mat = new Lambertian(new ConstantTexture(kd));
+
                     for (int k = 0; k < allMesh[i][j].NumTriangles; k++)
                     {
-                        //Get Material
-                        double red = Convert.ToDouble(materials[i][j].Color.Red) / 255;
-                        double green = Convert.ToDouble(materials[i][j].Color.Green) / 255;
-                        double blue = Convert.ToDouble(materials[i][j].Color.Blue) / 255;
-
-                        XYZ kd = new XYZ(red, green, blue);
-
-                        MyMaterial mat = new Lambertian(new ConstantTexture(kd));
-                        
                         //Get points 
                         MeshTriangle triangle = allMesh[i][j].get_Triangle(k);
 
@@ -685,41 +686,39 @@ namespace Form2
                     }
 
                 }
-
                 objects.Add(new MyMash(triangles));
             }
         }
-        public Bitmap GetImage(XYZ posicaoSol)
+
+        public void GetQuality(string quality)
         {
-            //pegando os dados
-            int largura = GetLargura();
-            int altura = GetAltura();
-            int nSamples = 0, ray_depth = 0;
-            if (GetQualidade() == "Baixa")
+            if (quality == "Baixa")
             {
                 nSamples = 10; ray_depth = 5;
             }
-            else if (GetQualidade() == "Média")
+            else if (quality == "Média")
             {
                 nSamples = 50; ray_depth = 50;
 
             }
-            else if (GetQualidade() == "Alta")
+            else if (quality == "Alta")
             {
                 nSamples = 100; ray_depth = 100;
             }
-            double t_min = 0.00001, t_max = double.PositiveInfinity;
+        }
 
+        public BackGround GetBackGround(string backGround)
+        {
             XYZ topleft;
             XYZ topRight;
             XYZ bottonLeft;
             XYZ bottonRight;
-            if (GetBackGround() == "Céu")
+            if (backGround == "Céu")
             {
                 topleft = new XYZ(1, 1, 1);
                 topRight = new XYZ(1, 1, 1);
-                bottonLeft = new XYZ(0, 0.2, 0.5);
-                bottonRight = new XYZ(0, 0.2, 0.5);
+                bottonLeft = new XYZ(0.5, 0.9, 1);
+                bottonRight = new XYZ(0.5, 0.9, 1);
             }
             else
             {
@@ -728,7 +727,24 @@ namespace Form2
                 bottonLeft = new XYZ(1, 1, 1);
                 bottonRight = new XYZ(1, 1, 1);
             }
-            BackGround bg = new BackGround(topleft, topRight, bottonLeft, bottonRight);
+            return new BackGround(topleft, topRight, bottonLeft, bottonRight);
+        }
+
+        public PerspectiveCamera GetCamera()
+        {
+            XYZ eye = new XYZ(listCam[0].X * -1, listCam[0].Z, listCam[0].Y * -1);
+            XYZ direction = new XYZ(listCam[1].X * -1, listCam[0].Z, listCam[1].Y * -1);
+            return new PerspectiveCamera(eye, direction, new XYZ(0, -1, 0), GetCampoVisao(), width / height, GetAbertura(), GetDistFocal());
+        }
+        public Bitmap GetImage(XYZ posicaoSol)
+        {
+            width = GetLargura();
+            height = GetAltura();
+            GetQuality(GetQualidade());
+
+            double t_min = 0.00001, t_max = double.PositiveInfinity;
+
+            BackGround bg = GetBackGround(GetBackGround());
 
             XYZ luzAmbiente = new XYZ(0.1, 0.1, 0.1);
 
@@ -742,16 +758,10 @@ namespace Form2
 
             Shader shader = new LambertianShader(world);
 
-            XYZ eye = new XYZ(listCam[0].X * -1, listCam[0].Z, listCam[0].Y * -1);
-            XYZ direction = new XYZ(listCam[1].X * -1, listCam[0].Z, listCam[1].Y * -1);
-
-            PerspectiveCamera cam = new PerspectiveCamera(eye, direction, new XYZ(0, -1, 0), GetCampoVisao(), largura / altura, GetAbertura(), GetDistFocal());
+            PerspectiveCamera cam = GetCamera();
 
             Raytrace raytrace = new Raytrace();
-            Bitmap img = raytrace.Render(cam, world, shader, largura, altura, nSamples, ray_depth, t_min, t_max);
-
-
-            //montando a imagem
+            Bitmap img = raytrace.Render(cam, world, shader, width, height, nSamples, ray_depth, t_min, t_max);
 
             return img;
         }

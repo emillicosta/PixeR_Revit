@@ -82,6 +82,14 @@ namespace PixeR
 
                 List<LightType> lights = GetLightsData(doc);
 
+                for(int i = 0; i< allMaterial.Count;i++)
+                    {
+                        if (allMaterial[i].Count != allMesh[i].Count)
+                        {
+                            TaskDialog.Show("Debug", "um elemento não tem a mesma quantidade de mesh e de material");
+                        }
+                    }
+
 
                 Form1.FormsImage wf = new Form1.FormsImage();
                 wf.ShowDialog();
