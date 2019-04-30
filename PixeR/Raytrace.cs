@@ -23,8 +23,8 @@ namespace Form2
                         double u = (col + rnd.NextDouble()) / n_cols; // walked u% of the horizontal dimension of the view plane.
                         double v = (row + rnd.NextDouble()) / n_rows; // walked v% of the vertical dimension of the view plane.
 
-                        Ray r = cam.get_ray(u, v);
-                        hue += shader.color(ref r, t_min, t_max, ray_depth);
+                        Ray r = cam.GetRay(u, v);
+                        hue += shader.Color(ref r, t_min, t_max, ray_depth);
                     }
 
                     hue /= Convert.ToDouble(n_samples);

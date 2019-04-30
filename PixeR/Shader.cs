@@ -7,9 +7,9 @@ namespace Form2
     public abstract class Shader
     {
         protected static Scene world;
-        public abstract XYZ color(ref Ray r, double t_min, double t_max, int depth_);
+        public abstract XYZ Color(ref Ray r, double t_min, double t_max, int depth_);
 
-        public static bool hit_anything(Ray r_, double t_min_, double t_max_, ref HitRecord ht_)
+        public static bool HitAnything(Ray r_, double t_min_, double t_max_, ref HitRecord ht_)
         {
             HitRecord temp_ht = new HitRecord();
             bool hit_anything = false;
@@ -26,7 +26,7 @@ namespace Form2
             return hit_anything;
         }
 
-       public static XYZ vertical_interpolation(Ray r_, XYZ bottom_, XYZ top_)
+       public static XYZ VerticalInterpolation(Ray r_, XYZ bottom_, XYZ top_)
         {
             // Make the ray a vector in the same direction.     
             XYZ ray = r_.GetDirection().Normalize();
@@ -39,11 +39,7 @@ namespace Form2
             return result;
         }
         
-        /*
-         * Calculates the horizontal interpolation between 2 colors
-         * Only works with the aspect ratio [2:1]
-         */
-       public static XYZ horizontal_interpolation(Ray r_, XYZ left_, XYZ right_)
+       public static XYZ HorizontalInterpolation(Ray r_, XYZ left_, XYZ right_)
         {
             // Make the ray a vector in the same direction.     
             XYZ ray = r_.GetDirection().Normalize();
@@ -56,7 +52,7 @@ namespace Form2
             return result;
         }
         
-        public static XYZ interpolation_biline(Ray r_)
+        public static XYZ InterpolationBiline(Ray r_)
         {
 
             XYZ unit_ray = r_.GetDirection().Normalize();

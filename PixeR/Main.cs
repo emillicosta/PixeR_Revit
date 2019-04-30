@@ -9,11 +9,8 @@ using Autodesk.Revit.UI;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI.Selection;
-using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB.Visual;
 using Autodesk.Revit.DB.Lighting;
-using Autodesk.Revit.DB.DirectContext3D;
-using Form2;
 
 namespace PixeR
 {
@@ -71,12 +68,6 @@ namespace PixeR
 
                 List<Element> elementsDoc = GetAllModelElements(doc);
 
-                List<List<Face>> allFaces = new List<List<Face>>();
-                foreach (Element e in elementsDoc)
-                {
-                    allFaces.Add(GetFaces(e));
-                }
-
                 List<List<Mesh>> allMesh = new List<List<Mesh>>();
                 foreach (Element e in elementsDoc)
                 {
@@ -84,28 +75,12 @@ namespace PixeR
                 }
 
                 List<List<Material>> allMaterial = new List<List<Material>>();
-                foreach (List<Face> f in allFaces)
+                foreach (Element e in elementsDoc)
                 {
-                    allMaterial.Add(GetMaterialFace(f, doc));
-                }
-                if(allMesh.Count == allMaterial.Count)
-                {
-                    for(int i = 0; i < allMesh.Count; i++)
-                    {
-                        if(allMesh[i].Count != allMaterial[i].Count)
-                        {
-                            TaskDialog.Show("Debug", "a quantidade de malhas não é igual a de materiais.");
-                        }
-                    }
-                }
-                else
-                {
-                    TaskDialog.Show("Debug", "a quantidade dos ELEMENTOS malhas não é igual a de materiais.");
+                    allMaterial.Add(GetMaterial(e, doc));
                 }
 
                 List<LightType> lights = GetLightsData(doc);
-
-                //List<Objeto> objects = GetObjects(elem,  doc);
 
 
                 Form1.FormsImage wf = new Form1.FormsImage();
@@ -242,9 +217,9 @@ namespace PixeR
             return meshes;
         }
 
-        private List<Face> GetFaces(Element element)
+        private List<Material> GetMaterial(Element element, Document doc)
         {
-            List<Face> faces = new List<Face>();
+            List<Material> materiais = new List<Material>();
             Options opt = new Options();
             GeometryElement geomElem = element.get_Geometry(opt);
             foreach (GeometryObject geomObj in geomElem)
@@ -254,7 +229,9 @@ namespace PixeR
                 {
                     foreach (Face geomFace in geomSolid.Faces)
                     {
-                        faces.Add(geomFace);
+                        ElementId elementId = geomFace.MaterialElementId;
+                        Material m = doc.GetElement(elementId) as Material;
+                        materiais.Add(m);
                     }
                 }
                 else
@@ -264,15 +241,17 @@ namespace PixeR
                     {
                         GeometryElement symbolGeo = geoInstance.SymbolGeometry;
 
-                        foreach (GeometryObject o2 in symbolGeo)
+                        foreach (GeometryObject geometryObject in symbolGeo)
                         {
-                            Solid s = o2 as Solid;
-                            if (null != s)
+                            Solid solid = geometryObject as Solid;
+                            if (null != solid)
                             {
                                 
-                                foreach (Face geomFace in s.Faces)
+                                foreach (Face geomFace in solid.Faces)
                                 {
-                                    faces.Add(geomFace);
+                                    ElementId elementId = geomFace.MaterialElementId;
+                                    Material m = doc.GetElement(elementId) as Material;
+                                    materiais.Add(m);
                                 }
                             }
                         }
@@ -280,24 +259,9 @@ namespace PixeR
                 }
             }
 
-            //TaskDialog.Show("Revit", faces.Size.ToString());
-            return faces;
+            return materiais;
         }
         
-        private List<Material> GetMaterialFace(List<Face> faces, Document doc)
-        {
-            List<Material> materiais = new List<Material>();
-
-            foreach (Face face in faces)
-            {
-                ElementId elementId = face.MaterialElementId;
-                Material m = doc.GetElement(elementId) as Material;
-                materiais.Add(m);
-            }
-
-            return materiais;
-            //TaskDialog.Show("Revit", faceInfo);
-        }
 
         public List<LightType> GetLightsData(Document document)
         {
@@ -342,183 +306,6 @@ namespace PixeR
             }
             return elem_light;
         }
-
-        public List<Objeto> GetObjects( List<Element> elements, Document doc)
-        {
-            List<Objeto> objetos = new List<Objeto>();
-            //String mensagem = "";
-
-            foreach (Element element in elements)
-            {
-                //mensagem = element.Name + "\n";
-                Options opt = new Options();
-                GeometryElement geomElem = element.get_Geometry(opt);
-                foreach (GeometryObject geoObject in geomElem)
-                {
-                    //get walls and floor
-                    Solid geomSolid = geoObject as Solid;
-                    if (null != geomSolid)
-                    {
-                        foreach (Face geomFace in geomSolid.Faces)
-                        {
-
-                            List<Triangle> triangles = new List<Triangle>();
-                            double xmin = double.PositiveInfinity, xmax = double.NegativeInfinity;
-                            double ymin = double.PositiveInfinity, ymax = double.NegativeInfinity;
-                            double zmin = double.PositiveInfinity, zmax = double.NegativeInfinity;
-
-                            MyMaterial mat = new Lambertian(new Constant_texture(new XYZ()));
-
-                            foreach (Face face in geomSolid.Faces)
-                            {
-                                //get material of face
-                                ElementId elementId = face.MaterialElementId;
-                                XYZ kd = new XYZ();
-                                Material m = doc.GetElement(elementId) as Material;
-                                if (m != null)
-                                {
-                                    double red = Convert.ToDouble(m.Color.Red) / 255;
-                                    double green = Convert.ToDouble(m.Color.Green) / 255;
-                                    double blue = Convert.ToDouble(m.Color.Blue) / 255;
-                                    kd = new XYZ(red, green, blue);
-                                }
-                                mat = new Lambertian(new Constant_texture(kd));
-
-                                //get point of object
-                                Mesh mesh = face.Triangulate();
-                                for (int k = 0; k < mesh.NumTriangles; k++)
-                                {
-                                    MeshTriangle triangle = mesh.get_Triangle(k);
-
-                                    XYZ v1 = new XYZ(triangle.get_Vertex(0).X * -1, triangle.get_Vertex(0).Z, triangle.get_Vertex(0).Y * -1);
-                                    xmin = Math.Min(v1.X, xmin);
-                                    ymin = Math.Min(v1.Y, ymin);
-                                    zmin = Math.Min(v1.Z, zmin);
-                                    xmax = Math.Max(v1.X, xmax);
-                                    ymax = Math.Max(v1.Y, ymax);
-                                    zmax = Math.Max(v1.Z, zmax);
-
-                                    XYZ v2 = new XYZ(triangle.get_Vertex(1).X * -1, triangle.get_Vertex(1).Z, triangle.get_Vertex(1).Y * -1);
-                                    xmin = Math.Min(v2.X, xmin);
-                                    ymin = Math.Min(v2.Y, ymin);
-                                    zmin = Math.Min(v2.Z, zmin);
-                                    xmax = Math.Max(v2.X, xmax);
-                                    ymax = Math.Max(v2.Y, ymax);
-                                    zmax = Math.Max(v2.Z, zmax);
-
-                                    XYZ v3 = new XYZ(triangle.get_Vertex(2).X * -1, triangle.get_Vertex(2).Z, triangle.get_Vertex(2).Y * -1);
-                                    xmin = Math.Min(v3.X, xmin);
-                                    ymin = Math.Min(v3.Y, ymin);
-                                    zmin = Math.Min(v3.Z, zmin);
-                                    xmax = Math.Max(v3.X, xmax);
-                                    ymax = Math.Max(v3.Y, ymax);
-                                    zmax = Math.Max(v3.Z, zmax);
-
-                                    triangles.Add(new Triangle(mat, v1, v2, v3));
-                                    //mensagem +=  v1.ToString() + v2.ToString() + v3.ToString() + " COR:" + m.Color.Red.ToString() + ";"+ m.Color.Green.ToString()+";"+ m.Color.Blue.ToString()+"\n";
-                                }
-                                //mensagem += "\n\n";
-                            }
-
-                            XYZ mini = new XYZ(xmin, ymin, zmin);
-                            XYZ maxi = new XYZ(xmax, ymax, zmax);
-
-                            objetos.Add(new MyMash(null, triangles, new Cube(null, mini, maxi)));
-                        }
-                    }
-
-                    //get the components
-                    GeometryInstance instance = geoObject as GeometryInstance;
-                    if (instance != null)
-                    {
-                        foreach (GeometryObject instObj in instance.SymbolGeometry)
-                        {
-                            Solid solid = instObj as Solid;
-                            if (null == solid || 0 == solid.Faces.Size || 0 == solid.Edges.Size)
-                            {
-                                continue;
-                            }
-                            Transform instTransform = instance.Transform;
-
-                            List<Triangle> triangles = new List<Triangle>();
-                            double xmin = double.PositiveInfinity, xmax = double.NegativeInfinity;
-                            double ymin = double.PositiveInfinity, ymax = double.NegativeInfinity;
-                            double zmin = double.PositiveInfinity, zmax = double.NegativeInfinity;
-
-                            MyMaterial mat = new Lambertian(new Constant_texture(new XYZ()));
-
-                            foreach (Face face in solid.Faces)
-                            {
-                                //get material of face
-                                ElementId elementId = face.MaterialElementId;
-                                XYZ kd = new XYZ();
-                                Material m = doc.GetElement(elementId) as Material;
-                                if (m != null)
-                                {
-                                    double red = Convert.ToDouble(m.Color.Red) / 255;
-                                    double green = Convert.ToDouble(m.Color.Green) / 255;
-                                    double blue = Convert.ToDouble(m.Color.Blue) / 255;
-                                    kd = new XYZ(red, green, blue);
-                                }
-                                mat = new Lambertian(new Constant_texture(kd));
-
-                                //get point of object
-                                Mesh mesh = face.Triangulate();
-                                if(instTransform != null)
-                                    mesh = mesh.get_Transformed(instTransform);
-                                for (int k = 0; k < mesh.NumTriangles; k++)
-                                {
-                                    MeshTriangle triangle = mesh.get_Triangle(k);
-
-                                    XYZ transV1 = triangle.get_Vertex(0);
-                                    XYZ v1 = new XYZ(transV1.X * -1, transV1.Z, transV1.Y * -1);
-                                    xmin = Math.Min(v1.X, xmin);
-                                    ymin = Math.Min(v1.Y, ymin);
-                                    zmin = Math.Min(v1.Z, zmin);
-                                    xmax = Math.Max(v1.X, xmax);
-                                    ymax = Math.Max(v1.Y, ymax);
-                                    zmax = Math.Max(v1.Z, zmax);
-
-                                    XYZ transV2 = triangle.get_Vertex(1);
-                                    XYZ v2 = new XYZ(transV2.X * -1, transV2.Z, transV2.Y * -1);
-                                    xmin = Math.Min(v2.X, xmin);
-                                    ymin = Math.Min(v2.Y, ymin);
-                                    zmin = Math.Min(v2.Z, zmin);
-                                    xmax = Math.Max(v2.X, xmax);
-                                    ymax = Math.Max(v2.Y, ymax);
-                                    zmax = Math.Max(v2.Z, zmax);
-
-                                    XYZ transV3 = triangle.get_Vertex(2);
-                                    XYZ v3 = new XYZ(transV3.X * -1, transV3.Z, transV3.Y * -1);
-                                    xmin = Math.Min(v3.X, xmin);
-                                    ymin = Math.Min(v3.Y, ymin);
-                                    zmin = Math.Min(v3.Z, zmin);
-                                    xmax = Math.Max(v3.X, xmax);
-                                    ymax = Math.Max(v3.Y, ymax);
-                                    zmax = Math.Max(v3.Z, zmax);
-
-                                    triangles.Add(new Triangle(mat, v1, v2, v3));
-                                    //mensagem +=  v1.ToString() + v2.ToString() + v3.ToString() + " COR:" + m.Color.Red.ToString() + ";"+ m.Color.Green.ToString()+";"+ m.Color.Blue.ToString()+"\n";
-                                }
-                                //mensagem += "\n\n";
-                            }
-
-                            XYZ mini = new XYZ(xmin, ymin, zmin);
-                            XYZ maxi = new XYZ(xmax, ymax, zmax);
-
-                            objetos.Add(new MyMash(null, triangles, new Cube(null, mini, maxi)));
-
-                            //TaskDialog.Show("Malha do objetos", mensagem);
-                        }
-                    }
-                }
-            }
-
-            return objetos;
-        }
-
-
-
 
     }
     //fim da classe main

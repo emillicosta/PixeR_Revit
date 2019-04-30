@@ -5,14 +5,14 @@ namespace Form2
 {
     public class Scene
     {
-        public List<Objeto> list;
+        public List<MyObject> list;
         public int list_size;
-        public List<Luzes> lum;
+        public List<MyLight> lum;
         public int lum_size;
-        public PlanoFundo bg;
+        public BackGround bg;
         public XYZ ambientLight;
 
-        public Scene(List<Objeto> list, List<Luzes> lum, PlanoFundo bg, XYZ ambientLight)
+        public Scene(List<MyObject> list, List<MyLight> lum, BackGround bg, XYZ ambientLight)
         {
             this.list = list;
             this.list_size = list.Count;

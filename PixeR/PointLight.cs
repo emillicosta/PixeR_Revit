@@ -2,13 +2,13 @@
 
 namespace Form2
 {
-    internal class PointLight : Luzes
+    internal class PointLight : MyLight
     {
         public XYZ origin;
         public PointLight(XYZ origin, XYZ intensity)
         {
             this.origin = origin;
-            Luzes.intensity = intensity;
+            MyLight.intensity = intensity;
         }
         public override XYZ GetDirection(XYZ point)
         {
@@ -16,7 +16,7 @@ namespace Form2
         }
         public override XYZ GetIntensity()
         {
-            return Luzes.intensity;
+            return MyLight.intensity;
         }
     }
 }

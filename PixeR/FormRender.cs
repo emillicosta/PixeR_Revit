@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Text.RegularExpressions;
 using Autodesk.Revit.UI;
-using Autodesk.Revit.DB.Lighting;
 using System.Collections.Generic;
 using Autodesk.Revit.DB;
 using System.Drawing;
@@ -41,12 +40,12 @@ namespace Form2
 
         private Regex reg = new Regex(@"^-?\d+[,]?\d*$");
         private ExternalCommandData commandData;
-        private Document doc;
+        private readonly Document doc;
         private List<Element> lights_on;
-        private List<List<Mesh>> allMesh;
-        private List<List<Material>> materials;
-        private List<XYZ> listCam;
-        private List<Objeto> objetos = new List<Objeto>();
+        private readonly List<List<Mesh>> allMesh;
+        private readonly List<List<Material>> materials;
+        private readonly List<XYZ> listCam;
+        private List<MyObject> objects = new List<MyObject>();
 
         public Regex Reg { get => reg; set => reg = value; }
         public ExternalCommandData CommandData { get => commandData; set => commandData = value; }
@@ -506,18 +505,18 @@ namespace Form2
                                                     {
                                                         //TaskDialog.Show("PixeR", textBox2.Text + " " + textBox3.Text + " " + comboBox1.Text + " " + textBox4.Text + " " + textBox5.Text + " " + textBox6 + " " + comboBox3.Text + " -" + maskedTextBox1.Text + "- " + textBox8.Text + " " + textBox9.Text + " " + comboBox4.Text);
 
-                                                        int dia = Convert.ToInt32(diaMes[0]);
-                                                        int mes = Convert.ToInt32(diaMes[1]);
-                                                        int ano = Convert.ToInt32(AnoHora[0]);
-                                                        int hora = Convert.ToInt32(horaMin[0]);
+                                                        int day = Convert.ToInt32(diaMes[0]);
+                                                        int month = Convert.ToInt32(diaMes[1]);
+                                                        int year = Convert.ToInt32(AnoHora[0]);
+                                                        int hour = Convert.ToInt32(horaMin[0]);
                                                         int min = Convert.ToInt32(horaMin[1]);
 
-                                                        Psa.Psa posicaoSol = new Psa.Psa(GetLatitude(), Getlongitude(), dia, mes, ano, hora, min);
-                                                        XYZ sol = posicaoSol.GetPosicao();
+                                                        Psa.Psa positionSun = new Psa.Psa(GetLatitude(), Getlongitude(), day, month, year, hour, min);
+                                                        XYZ sun = positionSun.GetPosition();
 
-                                                        Bitmap imagem = GetImage(sol);
+                                                        Bitmap image = GetImage(sun);
 
-                                                        Form4.FormsImage fi = new Form4.FormsImage(imagem);
+                                                        Form4.FormsImage fi = new Form4.FormsImage(image);
                                                         fi.ShowDialog();
                                                     }
                                                     else
@@ -650,8 +649,11 @@ namespace Form2
                         double red = Convert.ToDouble(materials[i][j].Color.Red) / 255;
                         double green = Convert.ToDouble(materials[i][j].Color.Green) / 255;
                         double blue = Convert.ToDouble(materials[i][j].Color.Blue) / 255;
+
                         XYZ kd = new XYZ(red, green, blue);
-                        MyMaterial mat = new Lambertian(new Constant_texture(kd));
+
+                        MyMaterial mat = new Lambertian(new ConstantTexture(kd));
+                        
                         //Get points 
                         MeshTriangle triangle = allMesh[i][j].get_Triangle(k);
 
@@ -680,17 +682,11 @@ namespace Form2
                         zmax = Math.Max(v3.Z, zmax);
 
                         triangles.Add(new Triangle(mat, v1, v2, v3));
-                        //mensagem +=  v1.ToString() + v2.ToString() + v3.ToString() + " COR:" + m.Color.Red.ToString() + ";"+ m.Color.Green.ToString()+";"+ m.Color.Blue.ToString()+"\n";
-
                     }
-                    //mensagem += "\n\n";
 
                 }
 
-                XYZ mini = new XYZ(xmin, ymin, zmin);
-                XYZ maxi = new XYZ(xmax, ymax, zmax);
-
-                objetos.Add(new MyMash(null, triangles, new Cube(null, mini, maxi)));
+                objects.Add(new MyMash(triangles));
             }
         }
         public Bitmap GetImage(XYZ posicaoSol)
@@ -732,28 +728,23 @@ namespace Form2
                 bottonLeft = new XYZ(1, 1, 1);
                 bottonRight = new XYZ(1, 1, 1);
             }
-            PlanoFundo bg = new PlanoFundo(topleft, topRight, bottonLeft, bottonRight);
+            BackGround bg = new BackGround(topleft, topRight, bottonLeft, bottonRight);
 
-
-            //TaskDialog.Show("Malha do objetos", mensagem);
             XYZ luzAmbiente = new XYZ(0.1, 0.1, 0.1);
 
-            List<Luzes> luzes = new List<Luzes>();
+            List<MyLight> luzes = new List<MyLight>();
             //adiciona o sol
             PointLight sol = new PointLight(posicaoSol, new XYZ(1, 1, 0));
             luzes.Add(sol);
             //adiciona luzes artificiais
 
-            Scene world = new Scene(objetos, luzes, bg, luzAmbiente);
+            Scene world = new Scene(objects, luzes, bg, luzAmbiente);
 
             Shader shader = new LambertianShader(world);
 
             XYZ eye = new XYZ(listCam[0].X * -1, listCam[0].Z, listCam[0].Y * -1);
             XYZ direction = new XYZ(listCam[1].X * -1, listCam[0].Z, listCam[1].Y * -1);
 
-            //TaskDialog.Show("pontos camera", "o: " + eye.ToString() + " D: " + direction.ToString());
-
-            //GetOrientation()
             PerspectiveCamera cam = new PerspectiveCamera(eye, direction, new XYZ(0, -1, 0), GetCampoVisao(), largura / altura, GetAbertura(), GetDistFocal());
 
             Raytrace raytrace = new Raytrace();

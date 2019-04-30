@@ -3,7 +3,7 @@
 namespace Form2
 {
     
-    public abstract class Objeto
+    public abstract class MyObject
     {
         public XYZ origin;
         public MyMaterial material;

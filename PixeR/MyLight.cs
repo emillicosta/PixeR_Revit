@@ -2,7 +2,7 @@
 
 namespace Form2
 {
-    public abstract class Luzes
+    public abstract class MyLight
     {
         public XYZ direction;
         public static XYZ intensity;

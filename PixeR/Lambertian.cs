@@ -14,12 +14,12 @@ namespace Form2
             alpha = 0;
         }
 
-        public override XYZ emitted(double u, double v, ref XYZ p)
+        public override XYZ Emitted(double u, double v, ref XYZ p)
         {
             return new XYZ();
         }
 
-        protected XYZ random_in_unit_sphere()
+        protected XYZ Random_in_unit_sphere()
         {
             Random rnd = new Random();
             XYZ p;
@@ -30,12 +30,12 @@ namespace Form2
             return p;
         }
 
-        public override bool scatter(ref Ray r, ref HitRecord ht_, ref XYZ attenuation_, ref Ray scattered_ray,ref  double reflect_prob, ref Ray scatterd2)
+        public override bool Scatter(ref Ray r, ref HitRecord ht_, ref XYZ attenuation_, ref Ray scattered_ray,ref  double reflect_prob, ref Ray scatterd2)
         {
-            XYZ p_ = random_in_unit_sphere();
+            XYZ p_ = Random_in_unit_sphere();
             XYZ target = ht_.p + ht_.normal + p_;
             scattered_ray = new Ray(ht_.p, target - ht_.p);
-            attenuation_ = albedo.value(0, 0, ht_.p);
+            attenuation_ = albedo.Value(0, 0, ht_.p);
 
             return true;
         }

@@ -31,7 +31,7 @@ namespace Form2
             vertical = 2 * half_height * focus_dist_ * v;
         }
 
-        public XYZ random_in_unit_sphere()
+        public XYZ Random_in_unit_sphere()
         {
             XYZ p;
             Random rnd = new Random();
@@ -40,9 +40,9 @@ namespace Form2
             }while(p.DotProduct(p) >= 1.0);
             return p;
         }
-        public Ray get_ray(double u_, double v_) 
+        public Ray GetRay(double u_, double v_) 
         {
-            XYZ rd = lens_radius * random_in_unit_sphere();
+            XYZ rd = lens_radius * Random_in_unit_sphere();
             XYZ offset = u * rd.X + v * rd.Y;
             XYZ end_point = lower_left_corner + u_ * horizontal + v_ * vertical;
             Ray r = new Ray(origin + offset, end_point - origin - offset );

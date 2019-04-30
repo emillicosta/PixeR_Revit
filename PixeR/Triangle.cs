@@ -2,7 +2,7 @@
 
 namespace Form2
 {
-    public class Triangle : Objeto
+    public class Triangle : MyObject
     {
         public bool backface_cull;
         public XYZ v0;
@@ -18,7 +18,7 @@ namespace Form2
             v1 = v1_;
             v2 = v2_;
             backface_cull = backface_cull_;
-            bbox = new Cube(material, min_vector(v0, min_vector(v1, v2)), max_vector(v0, max_vector(v1, v2)));
+            bbox = new Cube(material, MinVector(v0, MinVector(v1, v2)), MaxVector(v0, MaxVector(v1, v2)));
         }
 
         public override bool Hit(ref Ray r_, double t_min_, double t_max_, ref HitRecord  ht_ )
@@ -45,8 +45,6 @@ namespace Form2
                 inv_det = 1.0 / det;
                 double t = inv_det * e2.DotProduct(q);
                 t *= inv_det;
-                u *= inv_det;
-                v *= inv_det;
                 if (t > error && t <= t_max_) // ray intersection
                 {
                     ht_.t = t;
@@ -85,12 +83,10 @@ namespace Form2
                     return false;
             }
 
-
-            return true;
         }
 
 
-        public XYZ min_vector(XYZ v, XYZ u)
+        public XYZ MinVector(XYZ v, XYZ u)
         {
             double x, y, z;
             if (v.X < u.X)
@@ -112,7 +108,7 @@ namespace Form2
             return aux;
         }
 
-        public XYZ max_vector(XYZ v, XYZ u)
+        public XYZ MaxVector(XYZ v, XYZ u)
         {
             double x, y, z;
             if (v.X > u.X)

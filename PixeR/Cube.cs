@@ -3,13 +3,14 @@ using System;
 
 namespace Form2
 {
-    public class Cube : Objeto
+    public class Cube : MyObject
     {
         public XYZ maxi, mini;
         public Cube(MyMaterial m_, XYZ min_, XYZ max_)
         {
             origin = new XYZ(0, 0, 0);
             material = m_;
+
             double x = max_.X, y = max_.Y, z=max_.Z;
             if (min_.X == max_.X)
                 x += 0.1;
@@ -17,6 +18,7 @@ namespace Form2
                 y += 0.1;
             if (min_.Z == max_.Z)
                 z += 0.1;
+
             mini = min_;
             maxi = new XYZ(x,y,z);
         }
@@ -45,36 +47,21 @@ namespace Form2
 
             if (tmax > Math.Max(tmin, 0.0))
             {
-                return true;
-                double t = tmin;
-                ht_.t = tmin;
-                ht_.p = r_.PointAt(t);
-                XYZ c = (mini + maxi) * 0.5;
-                XYZ p = ht_.p - c;
-                XYZ d = (maxi - mini) * 0.5;
-                double bias = 1.000001;
-                XYZ normal = new XYZ(
-                        p.X / Math.Abs(d.X) * bias,
-                        p.Y / Math.Abs(d.Y) * bias,
-                        p.Z / Math.Abs(d.Z) * bias
-                       );
-                ht_.normal = normal.Normalize();
-                ht_.mat = material;
-                
+                return true;                
             }
 
             return false;
         }
 
-        public Cube wrap(ref Cube node, ref Cube bbox_tri)
+        public Cube Wrap(ref Cube node, ref Cube bbox_tri)
         {
-            XYZ mini_ = min_vector(node.mini, bbox_tri.mini);
-            XYZ maxi_1 = max_vector(node.maxi, bbox_tri.maxi);
+            XYZ mini_ = MinVector(node.mini, bbox_tri.mini);
+            XYZ maxi_1 = MaxVector(node.maxi, bbox_tri.maxi);
             Cube aux = new Cube(material, mini_, maxi_1);
             return aux;
         }
 
-        public XYZ min_vector(XYZ v,  XYZ u)
+        public XYZ MinVector(XYZ v,  XYZ u)
         {
             XYZ aux = new XYZ(0, 0, 0);
             if (v.X < u.X)
@@ -100,7 +87,7 @@ namespace Form2
             return aux ;
         }
 
-        public XYZ max_vector(XYZ v, XYZ u)
+        public XYZ MaxVector(XYZ v, XYZ u)
         {
             XYZ aux = new XYZ(0, 0, 0);
             if (v.X > u.X)

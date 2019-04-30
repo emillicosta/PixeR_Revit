@@ -1,5 +1,4 @@
-﻿using Autodesk.Revit.UI;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace Form2
@@ -13,13 +12,15 @@ namespace Form2
 
         public KDNode() { }
 
-        public KDNode build(ref List<Triangle> tris, int depth)
+        public KDNode Build(ref List<Triangle> tris, int depth)
         {
-            KDNode node = new KDNode();
-            node.triangles = tris;
-            node.left = null;
-            node.right = null;
-            node.bbox = null;
+            KDNode node = new KDNode
+            {
+                triangles = tris,
+                left = null,
+                right = null,
+                bbox = null
+            };
 
             if (tris.Count == 0) {
                 return node;
@@ -54,7 +55,7 @@ namespace Form2
             node.bbox = query.First().bbox;
             foreach(Triangle t in query)
             {
-                node.bbox = node.bbox.wrap(ref node.bbox, ref t.bbox);
+                node.bbox = node.bbox.Wrap(ref node.bbox, ref t.bbox);
             }
 
             int contAux = query.Count() / 2;
@@ -69,8 +70,8 @@ namespace Form2
             }
 
 
-            node.left = build(ref left_tris, depth + 1);
-            node.right = build(ref right_tris, depth + 1);
+            node.left = Build(ref left_tris, depth + 1);
+            node.right = Build(ref right_tris, depth + 1);
 
             return node;
         }
@@ -81,7 +82,7 @@ namespace Form2
             {
                 ht_ = new HitRecord();
                 HitRecord left_ht = new HitRecord(), right_ht = new HitRecord();
-                //TaskDialog.Show("qtd de left right", node.left.triangles.Count + "; " +node.right.triangles.Count);
+
                 if (node.left.triangles.Count > 0 || node.right.triangles.Count > 0)
                 {
                     bool hitleft = Hit(ref node.left, ref r_, t_min_, t_max_, ref left_ht);

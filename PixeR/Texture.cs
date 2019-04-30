@@ -4,6 +4,6 @@ namespace Form2
 {
     public abstract class Texture
     {
-        abstract public XYZ value(double u, double v, XYZ p);
+        public abstract XYZ Value(double u, double v, XYZ p);
     }
 }
