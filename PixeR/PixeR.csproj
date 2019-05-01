@@ -70,6 +70,7 @@
     <Compile Include="KDNode.cs" />
     <Compile Include="Lambertian.cs" />
     <Compile Include="LambertianShader.cs" />
+    <Compile Include="MetalMaterial.cs" />
     <Compile Include="MyLight.cs" />
     <Compile Include="MyMash.cs" />
     <Compile Include="MyMaterial.cs" />

@@ -12,6 +12,7 @@ namespace Form2
             this.o = o;
             this.d = d;
         }
+        public Ray() { }
         public XYZ GetDirection()
         {
             return d;

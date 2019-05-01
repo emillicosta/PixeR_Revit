@@ -15,7 +15,7 @@ namespace Form2
         public double m;
         public double ref_idx;
 
-        abstract public bool Scatter(ref Ray r, ref HitRecord ht, ref XYZ attenuation, ref Ray scatterd, ref double reflect_prob , ref Ray scatterd2 );
+        abstract public bool Scatter(ref Ray r, ref HitRecord ht, ref XYZ attenuation, ref Ray scatterd );
             
         abstract public XYZ Emitted(double u, double v,  ref XYZ p);
     }
