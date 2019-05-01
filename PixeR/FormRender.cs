@@ -638,9 +638,6 @@ namespace Form2
             {
                 //mensagem += "Objeto\n\n";
                 List<Triangle> triangles = new List<Triangle>();
-                double xmin = double.PositiveInfinity, xmax = double.NegativeInfinity;
-                double ymin = double.PositiveInfinity, ymax = double.NegativeInfinity;
-                double zmin = double.PositiveInfinity, zmax = double.NegativeInfinity;
 
                 for (int j = 0; j < allMesh[i].Count; j++)
                 {
@@ -658,29 +655,10 @@ namespace Form2
                         //Get points 
                         MeshTriangle triangle = allMesh[i][j].get_Triangle(k);
 
-                        XYZ v1 = new XYZ(triangle.get_Vertex(0).X * -1, triangle.get_Vertex(0).Z, triangle.get_Vertex(0).Y * -1);
-                        xmin = Math.Min(v1.X, xmin);
-                        ymin = Math.Min(v1.Y, ymin);
-                        zmin = Math.Min(v1.Z, zmin);
-                        xmax = Math.Max(v1.X, xmax);
-                        ymax = Math.Max(v1.Y, ymax);
-                        zmax = Math.Max(v1.Z, zmax);
+                        XYZ v1 = new XYZ(triangle.get_Vertex(0).X, -triangle.get_Vertex(0).Z, -triangle.get_Vertex(0).Y);
+                        XYZ v2 = new XYZ(triangle.get_Vertex(1).X, -triangle.get_Vertex(1).Z, -triangle.get_Vertex(1).Y);
+                        XYZ v3 = new XYZ(triangle.get_Vertex(2).X, -triangle.get_Vertex(2).Z, -triangle.get_Vertex(2).Y);
 
-                        XYZ v2 = new XYZ(triangle.get_Vertex(1).X * -1, triangle.get_Vertex(1).Z, triangle.get_Vertex(1).Y * -1);
-                        xmin = Math.Min(v2.X, xmin);
-                        ymin = Math.Min(v2.Y, ymin);
-                        zmin = Math.Min(v2.Z, zmin);
-                        xmax = Math.Max(v2.X, xmax);
-                        ymax = Math.Max(v2.Y, ymax);
-                        zmax = Math.Max(v2.Z, zmax);
-
-                        XYZ v3 = new XYZ(triangle.get_Vertex(2).X * -1, triangle.get_Vertex(2).Z, triangle.get_Vertex(2).Y * -1);
-                        xmin = Math.Min(v3.X, xmin);
-                        ymin = Math.Min(v3.Y, ymin);
-                        zmin = Math.Min(v3.Z, zmin);
-                        xmax = Math.Max(v3.X, xmax);
-                        ymax = Math.Max(v3.Y, ymax);
-                        zmax = Math.Max(v3.Z, zmax);
 
                         triangles.Add(new Triangle(mat, v1, v2, v3));
                     }
@@ -694,7 +672,7 @@ namespace Form2
         {
             if (quality == "Baixa")
             {
-                nSamples = 10; ray_depth = 5;
+                nSamples = 10; ray_depth = 50;
             }
             else if (quality == "Média")
             {
@@ -717,8 +695,8 @@ namespace Form2
             {
                 topleft = new XYZ(1, 1, 1);
                 topRight = new XYZ(1, 1, 1);
-                bottonLeft = new XYZ(0.5, 0.9, 1);
-                bottonRight = new XYZ(0.5, 0.9, 1);
+                bottonLeft = new XYZ(0, 0, 0);
+                bottonRight = new XYZ(0, 0, 0);
             }
             else
             {
@@ -732,9 +710,9 @@ namespace Form2
 
         public PerspectiveCamera GetCamera()
         {
-            XYZ eye = new XYZ(listCam[0].X * -1, listCam[0].Z, listCam[0].Y * -1);
-            XYZ direction = new XYZ(listCam[1].X * -1, listCam[0].Z, listCam[1].Y * -1);
-            return new PerspectiveCamera(eye, direction, new XYZ(0, -1, 0), GetCampoVisao(), width / height, GetAbertura(), GetDistFocal());
+            XYZ eye = new XYZ(listCam[0].X, -listCam[0].Z, -listCam[0].Y);
+            XYZ direction = new XYZ(listCam[1].X, -listCam[0].Z, -listCam[1].Y);
+            return new PerspectiveCamera(eye, direction, new XYZ(0, 1, 0), GetCampoVisao(), width / height, GetAbertura(), GetDistFocal());
         }
         public Bitmap GetImage(XYZ posicaoSol)
         {
