@@ -649,6 +649,8 @@ namespace Form2
                     XYZ kd = new XYZ(red, green, blue);
 
                     MyMaterial mat = new Lambertian(new ConstantTexture(kd));
+                    double ri =1;
+                    mat = new DIalectrisMaterial(new ConstantTexture(kd), ri);
 
                     for (int k = 0; k < allMesh[i][j].NumTriangles; k++)
                     {

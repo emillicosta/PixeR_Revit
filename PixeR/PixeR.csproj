@@ -57,6 +57,7 @@
     <Compile Include="BackGround.cs" />
     <Compile Include="ConstantTexture.cs" />
     <Compile Include="Cube.cs" />
+    <Compile Include="DIalectrisMaterial.cs" />
     <Compile Include="FormLight.cs">
       <SubType>Form</SubType>
     </Compile>

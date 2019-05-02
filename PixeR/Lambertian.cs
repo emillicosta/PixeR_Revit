@@ -33,8 +33,7 @@ namespace Form2
         public override bool Scatter(ref Ray r, ref HitRecord ht_, ref XYZ attenuation_, ref Ray scattered_ray)
         {
             XYZ p_ = Random_in_unit_sphere();
-            XYZ target = ht_.p + ht_.normal + p_;
-            scattered_ray = new Ray(ht_.p, ht_.p - ht_.normal + p_);//new Ray(ht_.p, ht_.p - target);
+            scattered_ray = new Ray(ht_.p, ht_.p - ht_.normal + Random_in_unit_sphere());
             attenuation_ = albedo.Value(0, 0, ht_.p);
 
             return true;
